@@ -137,4 +137,8 @@ This works but should be the exception. Poetry is the source of truth.
    app.include_router(<name>_router)
    ```
 4. Add cross-module shapes (if any) to `app/core/schemas.py`. Keep request/response shapes local to the module.
+
+## Branching, PRs, and team workflow
+
+See the [root README](../README.md#branching-and-pull-requests) for the shared `main`/`dev` branching model and pull request process. It applies to both `api/` and `client/`.
  

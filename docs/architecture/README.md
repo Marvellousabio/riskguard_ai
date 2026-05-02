@@ -1,6 +1,6 @@
 # RiskGuard AI Architecture Diagrams
 
-This folder contains two Excalidraw diagrams for the RiskGuard AI system.
+This folder contains three Excalidraw diagrams for the RiskGuard AI system.
 
 For the structural narrative tying these diagrams to the four engineering domains, see [`../MVP_BLUEPRINT.md`](../MVP_BLUEPRINT.md).
 

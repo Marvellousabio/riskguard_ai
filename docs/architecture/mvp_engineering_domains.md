@@ -9,7 +9,7 @@ Owns the source of truth for early detection.
 - `SyntheticEventGenerator`: produces baseline, Ikeja incident, recovery, and reset modes.
 - `EventNormalizer`: converts generated events into canonical `SignalEvent` objects.
 - `EntityResolver`: maps sites and raw locations to canonical LGA/cluster IDs.
-- `FeatureEngine`: computes rolling z-scores, deltas, and co-occurrence signals.
+- `FeatureEngine`: computes rolling z-scores, deltas, and co-occurrence signals across network, BTS, billing, sales, recharge, complaints, and device sessions.
 - `RiskScoringEngine`: produces score, severity, confidence, and time-to-breach.
 - `IncidentImpactBuilder`: produces incident details, affected subscribers, enterprise lines, revenue at risk, and NCC exposure.
 - `RecoveryModel`: moves risk from 87 toward 42 after approved mitigation.
@@ -26,7 +26,7 @@ Owns the backend integration surface.
 - `SimulationController`: start, trigger, mitigate, and reset.
 - `RiskController`: risk map and incident detail reads.
 - `CopilotController`: role-specific copilot query endpoint.
-- `ActionController`: simulation and human approval endpoints.
+- `ActionController`: mitigation options, simulation, and human approval endpoints.
 - `ComplianceController`: NCC pack generation endpoint.
 - `Repositories`: risk state, incident state, audit log, and pack storage.
 - `ApprovalService`: logs approved actions and triggers recovery.
@@ -56,10 +56,10 @@ Primary contract:
 
 Owns narrow, working agents that call real tools.
 
-- `AgentOrchestrator`: routes selected role/query to the right agent.
+- `SemanticKernelOrchestrator`: routes selected role/query to the right agent plugin.
+- `AzureOpenAIChatService`: Semantic Kernel chat completion service configuration.
 - `RoleAgents`: Network, Revenue Assurance, Customer Experience, Mitigation, and Compliance.
-- `AgentTools`: reads incident context, signal evidence, impact estimates, playbooks, simulations, audit trail, and pack drafts.
-- `OpenAIClient`: executes tool-using agent calls and returns structured output.
+- `AgentTools` (SK functions): reads incident context, signal evidence, impact estimates, playbooks, simulations, audit trail, and pack drafts.
 - `ClaimValidator`: rejects unsupported KPI, subscriber, money, site, and action claims.
 - `InvestigationNoteWriter`: writes validated agent summaries into the incident timeline/audit trail.
 
@@ -77,9 +77,10 @@ Primary contract:
 6. Operator asks a role-specific copilot question.
 7. Agent orchestrator routes to the right agent, which calls real backend tools.
 8. Claim validator checks the output before the UI renders it.
-9. Operator reviews mitigation options.
-10. Mitigation agent retrieves playbooks and runs pre-action simulations.
-11. Operator approves the selected action.
-12. Approval service writes audit log and triggers recovery.
-13. Risk engine updates the score downward.
-14. Compliance service generates the NCC pack from incident state, audit log, and validated agent notes.
+9. Operator reviews mitigation options from `GET /actions/options/{incident_id}`.
+10. API returns comparative projections (`POST /actions/simulate`) against do-nothing.
+11. Mitigation agent retrieves playbooks and runs pre-action simulations before recommendation.
+12. Operator approves the selected action.
+13. Approval service writes audit log and triggers recovery.
+14. Risk engine updates the score downward.
+15. Compliance service generates the NCC pack from incident state, audit log, and validated agent notes.

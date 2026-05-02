@@ -2,7 +2,7 @@
 
 This is the single document every engineer should read on Day 1, before opening their domain code. It explains what we are building this week, the demo we are telling, the four ownership domains, and exactly how those domains plug into each other.
 
-For depth on any section, follow the links in [Section 8](#8-pointers).
+For depth on any section, follow the links in [Section 9](#9-pointers).
 
 ---
 
@@ -43,6 +43,7 @@ sequenceDiagram
     API-->>FE: validated facts + inferences + recs
 
     Op->>FE: Review mitigation options
+    FE->>API: GET /actions/options/{incident_id}
     FE->>API: POST /actions/simulate
     API->>ENG: pre-action projection
     API-->>FE: do-nothing vs. action curves
@@ -71,7 +72,7 @@ The numbers (87, 42, 47 minutes to breach, 18,420 subscribers, 312 enterprise li
 | **1. Data & Risk Engine** | Engineer 1(Favour) | Synthetic generator, event normalization, entity resolution (LGA/cluster), feature engine, risk scoring, incident impact, recovery model | API surface, persistence, UI, agent reasoning |
 | **2. API, State, Audit, Compliance** | Engineer 2(Ladipo) | FastAPI app, controllers, repositories, audit log, approval service, compliance pack assembly, agent tool surface | Risk math, UI, agent prompts |
 | **3. Frontend Dashboard** | Engineer 3(Marvelous) | React shell, simulation controls, risk radar, incident panel, copilot panel, mitigation panel, NCC pack view | Any computation; renders only API shapes |
-| **4. Real Agentic Copilot** | Engineer 4(Tobi) | Orchestrator, role agents, agent tools, OpenAI client, claim validator, investigation note writer | Storage primitives, UI, risk math |
+| **4. Real Agentic Copilot** | Engineer 4(Tobi) | Semantic Kernel orchestrator, role agents (SK plugins), agent tools (SK functions), Azure OpenAI client, claim validator, investigation note writer | Storage primitives, UI, risk math |
 
 Each engineer should be able to answer two questions about their domain in one sentence: *what I produce* and *who consumes it*.
 
@@ -127,6 +128,7 @@ flowchart LR
 
 - **Direction:** Frontend calls REST. It renders only the shapes the API returns. No client-side risk math, no client-side aggregation that the API doesn't already do.
 - **Endpoints:**
+  - `GET  /me` — operator badge (id, name, role). Stubbed for the demo; populates the header.
   - `POST /simulation/start`
   - `POST /simulation/trigger/ikeja`
   - `POST /simulation/mitigate`
@@ -134,16 +136,18 @@ flowchart LR
   - `GET  /risk/map`
   - `GET  /incidents/{incident_id}`
   - `POST /copilot/query`
-  - `POST /actions/simulate`
+  - `GET  /actions/options/{incident_id}` — list of `MitigationOption` from the playbook for that risk type.
+  - `POST /actions/simulate` — projected score curves for selected options vs. do-nothing baseline.
   - `POST /actions/approve`
   - `GET  /compliance/pack/{incident_id}`
-- **Polling cadence:** 5 seconds for `/risk/map` and the active `/incidents/{id}`. All other reads are on-demand.
+- **Polling cadence:** 5 seconds for `/risk/map` and the active `/incidents/{id}`. All other reads are on-demand. **Day 5 stretch:** swap `/risk/map` polling for a single websocket channel (`WS /risk/stream`) to make recovery feel real-time on stage.
 - **Rule:** Response shapes are locked on Deliverable 1. The frontend codes against mocked responses with the locked shape until Engineer 2 wires the real path.
 
 ### 4.3 API/State ↔ Agentic Copilot (Engineer 2 ↔ Engineer 4)
 
-- **Direction:** The copilot consumes API/State as a **tool surface** (function-call style), not as REST. The frontend reaches the copilot through `POST /copilot/query`; the copilot reaches the system through tools.
-- **Tool surface (provided by Engineer 2):**
+- **Stack.** The copilot is built on the **Semantic Kernel SDK** with **Azure OpenAI** as the chat completion service. Each role agent is a Semantic Kernel plugin; each tool is registered as a kernel function with a JSON schema.
+- **Direction:** The copilot consumes API/State as a **tool surface** (kernel functions), not as REST. The frontend reaches the copilot through `POST /copilot/query`; the copilot reaches the system through SK function invocations that resolve to Engineer 2's repositories and services.
+- **Tool surface (provided by Engineer 2, registered by Engineer 4 as SK functions):**
   - `get_incident_context(lga_id)`
   - `get_signal_evidence(lga_id, domains=[...])`
   - `estimate_impact(incident_id)`
@@ -154,7 +158,7 @@ flowchart LR
   - `validate_claims_against_context(text, context_id)`
   - `write_investigation_note(incident_id, agent_role, summary, evidence_ids)`
 - Each tool resolves to a repository call or service call already owned by Engineer 2. The copilot does not see SQL, files, or raw CSVs.
-- **Output contract:** Every agent returns the structured JSON in `one_week_mvp_plan.md` (facts, inferences, recommendations, tools_called, validation_status). API/State runs `ClaimValidator` on the output before it returns to the caller.
+- **Output contract:** Every agent returns the structured JSON shape (facts, inferences, recommendations, tools_called, validation_status). API/State runs `ClaimValidator` on the output before it returns to the caller.
 - **Rule:** No agent answers without at least one tool call. No claim about a KPI, money, subscriber count, site, or action survives validation unless it traces to a tool result.
 
 ### 4.4 Frontend ↔ Copilot (indirect, through API)
@@ -169,10 +173,13 @@ These are the data shapes that cross domain boundaries. Engineer 2 publishes the
 
 | Shape | Producer → Consumer | Purpose |
 |---|---|---|
-| `SignalEvent` | Generator → Risk engine | Canonical normalized event (network, BTS, billing, complaints, recharge, device sessions). |
+| `SignalEvent` | Generator → Risk engine | Canonical normalized event across **network, BTS, billing, sales, recharge, complaints, device sessions** — the multi-source coverage required by the brief. |
 | `RiskScore` | Risk engine → API/State → Frontend | Per-LGA score, severity, confidence, time-to-breach. |
 | `Incident` | Risk engine → API/State → Frontend, Copilot | Cause, affected subscribers, enterprise lines, revenue at risk, NCC exposure, phase. |
+| `MitigationOption` | Playbook → API/State → Frontend, Copilot | Action id, name, description, expected risk delta, est. cost, time-to-effect, side effects, source playbook. |
+| `MitigationPlaybook` | Engineer 1 fixture → API/State | Risk type → ordered list of `MitigationOption`. Static for the demo; pluggable in production. |
 | Agent structured output | Copilot → API/State → Frontend | Facts, inferences, recommendations, tools_called, validation_status. |
+| `Operator` | `/me` → Frontend | Operator id, name, role (e.g. *Network Ops*, *Compliance Officer*). Stubbed for the demo, drives the badge and the audit log's `operator` field. |
 | `AuditLogEntry` | Approval service → Audit repo → Compliance | Operator, timestamp, action, expected impact, rationale. |
 | `NCCPack` | Compliance service → Frontend | Seven sections: timeline, affected services, KPIs, impacted subscribers, root cause, corrective actions, evidence logs. |
 
@@ -226,19 +233,19 @@ If you read only one section, read your own. Each engineer has a goal, day-by-da
 
 **Deliverables**
 
-- **Deliverable 1.** Publish Pydantic models: `SignalEvent`, `RiskScore`, `Incident`, agent output, `AuditLogEntry`, `NCCPack`. Stub all 10 endpoints with locked response shapes. Define the agent tool schemas. Skeleton repositories (in-memory or SQLite).
-- **Deliverable 2.** Wire real risk endpoints: `SimulationController` → generator; `RiskController` → `RiskScoreRepository` / `IncidentRepository`.
-- **Deliverable 3.** `POST /actions/simulate` endpoint. Real read tools backing the copilot tool surface (`get_incident_context`, `get_signal_evidence`, `estimate_impact`).
-- **Deliverable 4.** `POST /actions/approve` + append-only audit log + recovery trigger. Remaining tools (`get_mitigation_playbook`, `run_pre_action_simulation`, `get_audit_trail`, `generate_ncc_pack_draft`, `validate_claims_against_context`, `write_investigation_note`). Compliance pack assembly.
-- **Deliverable 5.** Bug fixes and perf (p99 < 300ms for dashboard/incident reads, pack < 10s).
+- **Deliverable 1.** Publish Pydantic models: `SignalEvent` (with the seven signal domains including `sales`), `RiskScore`, `Incident`, `MitigationOption`, `MitigationPlaybook`, `Operator`, agent output, `AuditLogEntry`, `NCCPack`. Stub all endpoints (including `GET /me` and `GET /actions/options/{incident_id}`) with locked response shapes. Define the agent tool schemas. Skeleton repositories (in-memory or SQLite).
+- **Deliverable 2.** Wire real risk endpoints: `SimulationController` → generator; `RiskController` → `RiskScoreRepository` / `IncidentRepository`. Stub `GET /me` returning a fixed `Operator`.
+- **Deliverable 3.** `GET /actions/options/{incident_id}` reading from the playbook fixture. `POST /actions/simulate` endpoint. Real read tools backing the copilot tool surface (`get_incident_context`, `get_signal_evidence`, `estimate_impact`).
+- **Deliverable 4.** `POST /actions/approve` + append-only audit log (operator from `/me`) + recovery trigger. Remaining tools (`get_mitigation_playbook`, `run_pre_action_simulation`, `get_audit_trail`, `generate_ncc_pack_draft`, `validate_claims_against_context`, `write_investigation_note`). Compliance pack assembly.
+- **Deliverable 5.** Bug fixes and perf (p99 < 300ms for dashboard/incident reads, pack < 10s). Stretch: `WS /risk/stream` to replace the 5s `/risk/map` poll.
 
 **You depend on:** Engineer 1 confirming engine method signatures by end of Deliverable 1.
 
 **Others depend on you for:** **End of Deliverable 1 — locked API shapes and tool schemas. If this slips, every other domain blocks.** Deliverable 2 — working risk endpoints. Deliverable 3 — simulate endpoint and read tools. Deliverable 4 — approval, audit, compliance pack, write tools.
 
-**Done when.** All 10 endpoints work against the demo path. Approval writes an `AuditLogEntry` and triggers recovery via the engine. Pack returns 7 sections in under 10 seconds. `ClaimValidator` runs server-side on every copilot response.
+**Done when.** All demo endpoints work against the story path (`/me`, simulation commands, risk reads, copilot query, action options/simulate/approve, compliance pack). Approval writes an `AuditLogEntry` and triggers recovery via the engine. Pack returns 7 sections in under 10 seconds. `ClaimValidator` runs server-side on every copilot response.
 
-**Do not.** Implement risk math. Render UI. Call OpenAI from controllers (that's Engineer 4). Edit or delete from the audit log.
+**Do not.** Implement risk math. Render UI. Call LLMs from controllers (that's Engineer 4's copilot stack via Semantic Kernel). Edit or delete from the audit log.
 
 ### 7.3 Engineer 3 — Frontend Dashboard
 
@@ -266,8 +273,8 @@ If you read only one section, read your own. Each engineer has a goal, day-by-da
 
 **Deliverables**
 
-- **Deliverable 1.** Define agent structured-output schema jointly with Engineer 2. `AgentOrchestrator` skeleton routing role → role agent. `OpenAIClient` wrapper with tool-call loop (max 3 turns, max 3 tools). All five role agents stubbed, returning canned structured output.
-- **Deliverable 2.** Replace mocked tools with real read tools (`get_incident_context`, `get_signal_evidence`, `estimate_impact`).
+- **Deliverable 1.** Define agent structured-output schema jointly with Engineer 2. Build a `SemanticKernelOrchestrator` skeleton routing role → role plugin. Configure Azure OpenAI chat completion in Semantic Kernel and register placeholder SK functions for the tool surface. All five role plugins stubbed, returning canned structured output.
+- **Deliverable 2.** Replace placeholder functions with real read tools (`get_incident_context`, `get_signal_evidence`, `estimate_impact`) registered as SK functions.
 - **Deliverable 3.** All five role agents calling real tools. `ClaimValidator` rejects unsupported KPI / money / subscriber / site / action claims. Lock the canonical demo questions: *Why is Ikeja high risk? / Are there revenue leakage signals? / How many subscribers are affected? / What should we do now? / What is our NCC exposure?*
 - **Deliverable 4.** `MitigationPlanningAgent` calls `get_mitigation_playbook` and `run_pre_action_simulation` *before* recommending. `ComplianceAgent` calls `get_audit_trail` and `generate_ncc_pack_draft`. `InvestigationNoteWriter` writes validated agent summaries that surface in the pack.
 - **Deliverable 5.** Demo question rehearsal. Lock prompts so output is deterministic enough to demo.
@@ -276,7 +283,7 @@ If you read only one section, read your own. Each engineer has a goal, day-by-da
 
 **Others depend on you for:** Deliverable 3 — working copilot answers (Engineer 3's panel renders them). Deliverable 4 — investigation notes that surface in the NCC pack.
 
-**Done when.** Every demo agent calls at least one real tool before answering. `ClaimValidator` rejects an obviously fabricated claim in tests. Mitigation agent retrieves a playbook and runs a simulation before recommending. Compliance agent's notes appear in the rendered NCC pack.
+**Done when.** Every demo agent calls at least one real SK function before answering. `ClaimValidator` rejects an obviously fabricated claim in tests. Mitigation agent retrieves a playbook and runs a simulation before recommending. Compliance agent's notes appear in the rendered NCC pack.
 
 **Do not.** Let agents inspect raw CSVs or arbitrary data. Add a sixth role agent. Build autonomous loops or multi-agent debate. Allow free-form Q&A outside the canonical demo questions on the demo path.
 
@@ -292,6 +299,7 @@ These come from the functional and non-functional requirements. They are not neg
 - **No automated mitigation.** Human approval is mandatory. The audit entry is the only path that switches the engine to recovery.
 - **Append-only audit log.** Never edit, never delete.
 - **Offline demo.** No real MTN integrations, no real customer PII. Synthetic data only.
+- **Hackathon stack alignment.** Copilot runtime uses Semantic Kernel with Azure OpenAI.
 
 If you are about to break one of these to ship faster, stop and escalate.
 
@@ -299,8 +307,8 @@ If you are about to break one of these to ship faster, stop and escalate.
 
 ## 9. Pointers
 
-- [`functional_requirements.md`](../functional_requirements.md) — what users must be able to do; non-functional targets.
-- [`one_week_mvp_plan.md`](../one_week_mvp_plan.md) — full scope, capacity, day-by-day plan, agent runtime details, cut line.
+- [`Comprehensive reqs.md`](./Comprehensive%20reqs.md) — what users must be able to do; non-functional targets.
+- [`MVP_PLAN.md`](./MVP_PLAN.md) — full scope, capacity, day-by-day plan, agent runtime details, cut line.
 - [`docs/architecture/mvp_engineering_domains.md`](architecture/mvp_engineering_domains.md) — per-domain component lists.
 - `docs/architecture/riskguard-mvp-engineering-domains.excalidraw` — visual ownership view.
 - `docs/architecture/riskguard-modules-classes.excalidraw` — module and class interaction view.
