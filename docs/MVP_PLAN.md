@@ -148,12 +148,14 @@ The agent layer should be real, but tightly bounded. The goal is not autonomous 
 
 Use an orchestrator-workers pattern:
 
-1. `AgentOrchestrator` receives a user query or system event.
+1. `SemanticKernelOrchestrator` receives a user query or system event.
 2. It routes to one role agent based on selected role or intent.
 3. The role agent can call approved tools.
 4. The agent returns structured output.
 5. `ClaimValidator` checks that named KPIs, entities, counts, money values, and actions came from tool results.
 6. The UI renders the validated answer.
+
+Stack requirement for the hackathon demo: Semantic Kernel SDK + Azure OpenAI.
 
 Each agent run should have:
 
@@ -183,13 +185,13 @@ Implement five role agents, but keep their capability narrow:
 
 2. `RevenueAssuranceAgent`
 
-   Job: identify billing, recharge, and revenue leakage signals.
+   Job: identify billing, sales, recharge, and revenue leakage signals.
 
    Required tools:
 
    - `get_incident_context(lga_id)`
    - `estimate_impact(incident_id)`
-   - `get_signal_evidence(lga_id, domains=["billing", "recharge"])`
+   - `get_signal_evidence(lga_id, domains=["billing", "sales", "recharge"])`
 
    Demo query:
 
@@ -303,7 +305,7 @@ These are the minimum behaviors that make the copilot agentic rather than decora
 - Stub all endpoints with expected response shapes.
 - Build basic UI layout against mocked data.
 - Define agent tool schemas and structured output schema.
-- Implement `AgentOrchestrator` skeleton with mocked tool calls.
+- Implement `SemanticKernelOrchestrator` skeleton with mocked SK function calls and Azure OpenAI configuration.
 
 Target demo by end of day:
 
@@ -317,7 +319,7 @@ Target demo by end of day:
 - Implement risk scoring and incident state.
 - Wire simulation controls to backend.
 - Make frontend poll risk map and incident APIs.
-- Replace mocked agent tools with real backend read tools for incident context, signal evidence, and impact.
+- Replace mocked agent tools with real backend read tools for incident context, signal evidence, and impact (registered as SK functions).
 
 Target demo by end of day:
 
@@ -329,7 +331,7 @@ Target demo by end of day:
 ### Day 3: Copilot and Mitigation
 
 - Implement context assembler.
-- Implement five role agents with real tool calls.
+- Implement five role agents as Semantic Kernel plugins with real tool calls.
 - Implement claim validation for entity, KPI, money, subscriber, and action claims.
 - Implement playbook registry.
 - Implement pre-action simulator.
