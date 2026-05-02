@@ -1,6 +1,6 @@
 # RiskGuard AI — MVP Blueprint
 
-This is the single document every engineer should read on Deliverable 1, before opening their domain code. It explains what we are building this week, the demo we are telling, the four ownership domains, and exactly how those domains plug into each other.
+This is the single document every engineer should read on Day 1, before opening their domain code. It explains what we are building this week, the demo we are telling, the four ownership domains, and exactly how those domains plug into each other.
 
 For depth on any section, follow the links in [Section 8](#8-pointers).
 
@@ -34,7 +34,7 @@ sequenceDiagram
     FE->>API: GET /risk/map, /incidents/{id} (poll 5s)
     API-->>FE: severity, time-to-breach, impact
 
-    Op->>FE: Ask "Why is Ikeja high risk?"
+    Op->>FE: Agent Detects Issue "Why is Ikeja high risk?"
     FE->>API: POST /copilot/query (role=network)
     API->>COP: route to NetworkRiskAgent
     COP->>API: tool calls (incident context, evidence)
@@ -68,10 +68,10 @@ The numbers (87, 42, 47 minutes to breach, 18,420 subscribers, 312 enterprise li
 
 | Domain | Owner | Owns | Does NOT own |
 |---|---|---|---|
-| **1. Data & Risk Engine** | Engineer 1 | Synthetic generator, event normalization, entity resolution (LGA/cluster), feature engine, risk scoring, incident impact, recovery model | API surface, persistence, UI, agent reasoning |
-| **2. API, State, Audit, Compliance** | Engineer 2 | FastAPI app, controllers, repositories, audit log, approval service, compliance pack assembly, agent tool surface | Risk math, UI, agent prompts |
-| **3. Frontend Dashboard** | Engineer 3 | React shell, simulation controls, risk radar, incident panel, copilot panel, mitigation panel, NCC pack view | Any computation; renders only API shapes |
-| **4. Real Agentic Copilot** | Engineer 4 | Orchestrator, role agents, agent tools, OpenAI client, claim validator, investigation note writer | Storage primitives, UI, risk math |
+| **1. Data & Risk Engine** | Engineer 1(Favour) | Synthetic generator, event normalization, entity resolution (LGA/cluster), feature engine, risk scoring, incident impact, recovery model | API surface, persistence, UI, agent reasoning |
+| **2. API, State, Audit, Compliance** | Engineer 2(Ladipo) | FastAPI app, controllers, repositories, audit log, approval service, compliance pack assembly, agent tool surface | Risk math, UI, agent prompts |
+| **3. Frontend Dashboard** | Engineer 3(Marvelous) | React shell, simulation controls, risk radar, incident panel, copilot panel, mitigation panel, NCC pack view | Any computation; renders only API shapes |
+| **4. Real Agentic Copilot** | Engineer 4(Tobi) | Orchestrator, role agents, agent tools, OpenAI client, claim validator, investigation note writer | Storage primitives, UI, risk math |
 
 Each engineer should be able to answer two questions about their domain in one sentence: *what I produce* and *who consumes it*.
 

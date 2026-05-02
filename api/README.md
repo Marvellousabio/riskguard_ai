@@ -137,3 +137,4 @@ This works but should be the exception. Poetry is the source of truth.
    app.include_router(<name>_router)
    ```
 4. Add cross-module shapes (if any) to `app/core/schemas.py`. Keep request/response shapes local to the module.
+ 
