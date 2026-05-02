@@ -231,6 +231,42 @@ If you read only one section, read your own. Each engineer has a goal, day-by-da
 
 **Goal.** Be the contract layer. Lock shapes on Deliverable 1, expose stable REST and tool surfaces, keep audit append-only, assemble the NCC pack.
 
+**What you actually own**
+
+- **Public REST endpoints for the frontend.** These are the routes Engineer 3 calls directly:
+  - `GET /me` — returns the current demo operator for the header badge and audit context.
+  - `POST /simulation/start` — switches the system into baseline streaming mode.
+  - `POST /simulation/trigger/ikeja` — triggers the canonical Ikeja incident path.
+  - `POST /simulation/mitigate` — moves the simulation toward mitigation/recovery mode when the approved action flow is exercised.
+  - `POST /simulation/reset` — resets demo state back to clean baseline.
+  - `GET /risk/map` — returns the current LGA risk view for the map/list.
+  - `GET /incidents/{incident_id}` — returns the active incident detail panel payload.
+  - `POST /copilot/query` — accepts `{role, query, incident_id}` and returns validated structured copilot output.
+  - `GET /actions/options/{incident_id}` — returns mitigation options from the relevant playbook for operator comparison.
+  - `POST /actions/simulate` — returns projected outcome curves for selected options vs. do-nothing.
+  - `POST /actions/approve` — records operator approval, appends audit, and triggers recovery.
+  - `GET /compliance/pack/{incident_id}` — returns the assembled NCC-ready evidence pack.
+- **Internal backend services and state.** These are backend features, not frontend routes:
+  - `SimulationController` — translates frontend simulation commands into calls into Engineer 1's generator/runtime.
+  - `RiskController` — reads materialized risk and incident state and shapes it for the UI.
+  - `CopilotController` — validates the copilot request/response contract and keeps validation server-side.
+  - `ActionController` — coordinates option lookup, simulation requests, and approval flow.
+  - `ApprovalService` — owns the human-approval gate; no recovery starts without passing through here.
+  - `CompliancePackService` — assembles the seven-section NCC pack from incident state, audit history, and validated notes.
+  - `Repositories` — persistence contracts for risk state, incidents, audit log, playbooks, and pack storage.
+- **Agent-only tool surface for Engineer 4.** These are not public UI routes. They are backend functions exposed to Semantic Kernel:
+  - `get_incident_context(lga_id)` — returns the normalized incident summary and key identifiers.
+  - `get_signal_evidence(lga_id, domains=[...])` — returns supporting evidence across selected signal domains.
+  - `estimate_impact(incident_id)` — returns operator-facing impact numbers such as subscribers, revenue, and compliance exposure.
+  - `get_mitigation_playbook(risk_type)` — returns the ordered mitigation options for the incident type.
+  - `run_pre_action_simulation(incident_id, action_ids)` — runs comparison projections for one or more candidate actions.
+  - `get_audit_trail(incident_id)` — returns approved actions and related timeline evidence.
+  - `generate_ncc_pack_draft(incident_id)` — returns draft compliance pack content for the compliance agent.
+  - `validate_claims_against_context(text, context_id)` — checks whether narrative claims are grounded in structured context.
+  - `write_investigation_note(incident_id, agent_role, summary, evidence_ids)` — persists validated agent notes for pack/timeline use.
+
+**Important boundary.** Ladipo owns both the REST layer and the backend contract layer. That does **not** mean every backend feature is a route. Frontend-facing actions are routes; agent-facing capabilities are tools; state coordination lives in services and repositories.
+
 **Deliverables**
 
 - **Deliverable 1.** Publish Pydantic models: `SignalEvent` (with the seven signal domains including `sales`), `RiskScore`, `Incident`, `MitigationOption`, `MitigationPlaybook`, `Operator`, agent output, `AuditLogEntry`, `NCCPack`. Stub all endpoints (including `GET /me` and `GET /actions/options/{incident_id}`) with locked response shapes. Define the agent tool schemas. Skeleton repositories (in-memory or SQLite).

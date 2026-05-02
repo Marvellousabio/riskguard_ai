@@ -23,18 +23,42 @@ Primary contract:
 Owns the backend integration surface.
 
 - `FastAPI App`: shared routing, schemas, CORS, and configuration.
-- `SimulationController`: start, trigger, mitigate, and reset.
-- `RiskController`: risk map and incident detail reads.
-- `CopilotController`: role-specific copilot query endpoint.
-- `ActionController`: mitigation options, simulation, and human approval endpoints.
-- `ComplianceController`: NCC pack generation endpoint.
-- `Repositories`: risk state, incident state, audit log, and pack storage.
-- `ApprovalService`: logs approved actions and triggers recovery.
-- `CompliancePackService`: assembles structured NCC sections.
+- Public frontend routes:
+  - `GET /me`
+  - `POST /simulation/start`
+  - `POST /simulation/trigger/ikeja`
+  - `POST /simulation/mitigate`
+  - `POST /simulation/reset`
+  - `GET /risk/map`
+  - `GET /incidents/{incident_id}`
+  - `POST /copilot/query`
+  - `GET /actions/options/{incident_id}`
+  - `POST /actions/simulate`
+  - `POST /actions/approve`
+  - `GET /compliance/pack/{incident_id}`
+- Backend services/controllers behind those routes:
+  - `SimulationController`: start, trigger, mitigate, and reset.
+  - `RiskController`: risk map and incident detail reads.
+  - `CopilotController`: role-specific copilot query entrypoint and response validation boundary.
+  - `ActionController`: mitigation options, simulation, and human approval flow.
+  - `ComplianceController`: NCC pack generation endpoint.
+  - `ApprovalService`: logs approved actions and triggers recovery.
+  - `CompliancePackService`: assembles structured NCC sections.
+  - `Repositories`: risk state, incident state, audit log, playbook, operator, and pack storage.
+- Agent tool surface for Engineer 4. These are backend functions, not public routes:
+  - `get_incident_context`
+  - `get_signal_evidence`
+  - `estimate_impact`
+  - `get_mitigation_playbook`
+  - `run_pre_action_simulation`
+  - `get_audit_trail`
+  - `generate_ncc_pack_draft`
+  - `validate_claims_against_context`
+  - `write_investigation_note`
 
 Primary contract:
 
-- Exposes stable REST endpoints to Engineer 3 and stable tool/repository functions to Engineer 4.
+- Exposes stable REST endpoints to Engineer 3 and stable tool/service/repository functions to Engineer 4. Not every backend capability is a route.
 
 ## Engineer 3: Frontend Dashboard
 
