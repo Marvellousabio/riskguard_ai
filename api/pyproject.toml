@@ -1,0 +1,20 @@
+[project]
+name = "riskguard-api"
+version = "0.1.0"
+description = "RiskGuard AI API — modular FastAPI backend."
+authors = [{ name = "RiskGuard team" }]
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "fastapi (>=0.115,<1.0)",
+    "uvicorn[standard] (>=0.32,<1.0)",
+    "pydantic (>=2.9,<3.0)",
+    "pydantic-settings (>=2.5,<3.0)",
+    "python-dotenv (>=1.0,<2.0)",
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false

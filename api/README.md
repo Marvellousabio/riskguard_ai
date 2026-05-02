@@ -1,0 +1,139 @@
+# RiskGuard API
+
+Modular FastAPI backend. Package management is via [Poetry](https://python-poetry.org/). `requirements.txt` is kept up to date as a fallback for pip-only environments.
+
+## Layout
+
+```
+api/
+├── main.py                    # uvicorn entry: imports app from app/__init__.py
+├── pyproject.toml             # Poetry-managed project + dependencies (source of truth)
+├── poetry.lock                # locked dependency versions
+├── requirements.txt           # pinned snapshot for pip-only installs
+├── .env.example
+└── app/
+    ├── __init__.py            # create_app() — CORS + router registration
+    ├── core/
+    │   ├── config.py          # Settings via pydantic-settings
+    │   └── schemas.py         # cross-domain Pydantic shapes
+    └── modules/
+        ├── simulation/        routes.py services.py db.py schemas.py
+        ├── risk/              ...
+        ├── incidents/         ...
+        ├── copilot/           ...
+        ├── actions/           ...
+        ├── compliance/        ...
+        └── audit/             services.py db.py schemas.py (no public router)
+```
+
+Each module owns its own `routes.py` (APIRouter), `services.py` (business logic), `db.py` (repository + dependency provider), `schemas.py` (request/response shapes). Shared shapes that cross domain boundaries live in `app/core/schemas.py`.
+
+## Prerequisites
+
+- Python ≥ 3.11
+- [Poetry ≥ 2.0](https://python-poetry.org/docs/#installation) — `brew install poetry` on macOS
+
+## First-time setup
+
+```bash
+cd api
+cp .env.example .env
+poetry install
+```
+
+Poetry creates a virtual environment in `.venv/` (configured via `poetry config --local virtualenvs.in-project true`) and installs everything listed in `pyproject.toml` at the versions in `poetry.lock`.
+
+## Run the server
+
+```bash
+poetry run uvicorn main:app --reload
+```
+
+- Server: http://127.0.0.1:8000
+- Swagger UI: http://127.0.0.1:8000/docs
+- Health check: http://127.0.0.1:8000/health
+
+For a non-reload run (production-style):
+
+```bash
+poetry run uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+You can also drop into the venv shell first and run `uvicorn` directly:
+
+```bash
+poetry env activate          # prints an activation command — eval it, or copy/paste
+uvicorn main:app --reload
+```
+
+## Managing packages
+
+**Add a runtime dependency:**
+
+```bash
+poetry add <package>
+# example: poetry add httpx
+```
+
+**Add a dev-only dependency** (tests, linters, etc.):
+
+```bash
+poetry add --group dev <package>
+# example: poetry add --group dev pytest ruff
+```
+
+**Remove a package:**
+
+```bash
+poetry remove <package>
+```
+
+**Update all packages within their constraint ranges:**
+
+```bash
+poetry update
+```
+
+**Update a specific package:**
+
+```bash
+poetry update <package>
+```
+
+After any of the above, regenerate `requirements.txt` so pip-only consumers stay in sync:
+
+```bash
+poetry run pip freeze > requirements.txt
+```
+
+If you have the `poetry-plugin-export` plugin installed, the cleaner form is:
+
+```bash
+poetry export -f requirements.txt --output requirements.txt --without-hashes
+```
+
+Commit `pyproject.toml`, `poetry.lock`, and the regenerated `requirements.txt` together.
+
+## Pip-only fallback
+
+If a contributor cannot install Poetry:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+This works but should be the exception. Poetry is the source of truth.
+
+## Adding a new module
+
+1. Create `app/modules/<name>/` with `__init__.py`, `routes.py`, `services.py`, `db.py`, `schemas.py`.
+2. Define the `APIRouter` in `routes.py` with a `prefix` and `tags`.
+3. Register it in `app/__init__.py`:
+   ```python
+   from app.modules.<name>.routes import router as <name>_router
+   app.include_router(<name>_router)
+   ```
+4. Add cross-module shapes (if any) to `app/core/schemas.py`. Keep request/response shapes local to the module.
