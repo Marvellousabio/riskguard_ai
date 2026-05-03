@@ -1,122 +1,90 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-function App() {
-  const [count, setCount] = useState(0)
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
+import { TopBar } from "./components/layout/TopBar";
+import { RiskRadar } from "./components/risk/RiskRadar";
+import { IncidentPanel } from "./components/incident/IncidentPanel";
+import { CopilotPanel } from "./components/copilot/CopilotPanel";
+import { MitigationPanel } from "./components/mitigation/MitigationPanel";
+import { CompliancePackView } from "./components/compliance/CompliancePack";
+import { RecoveryView } from "./components/risk/RecoveryView";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+export default function App() {
+  const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"incident" | "compliance">("incident");
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <QueryClientProvider client={queryClient}>
+      <div className="h-screen w-full flex flex-col bg-background overflow-hidden">
+        <TopBar onIncidentDetection={(id) => setSelectedIncidentId(id)} />
+        
+        <main className="flex-1 flex overflow-hidden">
+          {/* Sidebar: Risk Radar */}
+          <aside className="w-72 bg-white border-r flex flex-col flex-none">
+            <div className="p-4 border-b flex-none">
+              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Risk Radar (LGAs)</h2>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <RiskRadar 
+                onSelectLGA={(lgaId) => {
+                  if (lgaId === "ikeja") {
+                    setSelectedIncidentId("INC-IK-001");
+                  }
+                }} 
+              />
+            </div>
+            <div className="p-4 border-t bg-slate-50 flex-none">
+              <RecoveryView />
+            </div>
+          </aside>
 
-      <div className="ticks"></div>
+          {/* Content Area */}
+          <section className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
+            <div className="flex bg-slate-100 p-1 rounded-lg self-start flex-none">
+              <button 
+                onClick={() => setActiveTab("incident")}
+                className={`px-4 py-1 rounded text-[10px] font-bold uppercase transition-all ${
+                  activeTab === "incident" ? "bg-white shadow text-slate-900 border border-slate-200" : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                Operational Command
+              </button>
+              <button 
+                onClick={() => setActiveTab("compliance")}
+                className={`px-4 py-1 rounded text-[10px] font-bold uppercase transition-all ${
+                  activeTab === "compliance" ? "bg-white shadow text-slate-900 border border-slate-200" : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                Compliance Documentation
+              </button>
+            </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            <div className="flex-1 overflow-hidden">
+              {activeTab === "incident" ? (
+                <IncidentPanel incidentId={selectedIncidentId}>
+                  <CopilotPanel incidentId={selectedIncidentId} />
+                  <MitigationPanel incidentId={selectedIncidentId} />
+                </IncidentPanel>
+              ) : (
+                <CompliancePackView incidentId={selectedIncidentId} />
+              )}
+            </div>
+          </section>
+        </main>
+      </div>
+    </QueryClientProvider>
+  );
 }
-
-export default App
