@@ -4,14 +4,14 @@ import { createServer as createViteServer } from "vite";
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = 3001;
 
   app.use(express.json());
 
   // --- Simulation State ---
   let simulationState = {
     status: "idle", // "idle" | "active" | "mitigating" | "recovered"
-    lastIncidentId: null as string | null,
+    activeIncidents: [] as { id: string; lgaId: string }[],
     startTime: Date.now(),
   };
 
@@ -32,14 +32,14 @@ async function startServer() {
 
   // Simulation Controls
   app.post("/api/simulation/start", (req, res) => {
-    simulationState = { status: "idle", lastIncidentId: null, startTime: Date.now() };
+    simulationState = { status: "idle", activeIncidents: [], startTime: Date.now() };
     res.json({ status: "ok", message: "Simulation initialized" });
   });
 
-  app.post("/api/simulation/trigger/ikeja", (req, res) => {
+  app.post("/api/simulation/trigger", (req, res) => {
     simulationState.status = "active";
-    simulationState.lastIncidentId = "INC-IK-001";
-    res.json({ status: "ok", message: "Incident triggered in Ikeja" });
+    simulationState.activeIncidents = LGAS.map(lga => ({ id: `INC-${lga.id.toUpperCase()}-001`, lgaId: lga.id }));
+    res.json({ status: "ok", message: "Incidents triggered in all LGAs" });
   });
 
   app.post("/api/simulation/mitigate", (req, res) => {
@@ -51,20 +51,21 @@ async function startServer() {
   });
 
   app.post("/api/simulation/reset", (req, res) => {
-    simulationState = { status: "idle", lastIncidentId: null, startTime: Date.now() };
+    simulationState = { status: "idle", activeIncidents: [], startTime: Date.now() };
     res.json({ status: "ok", message: "System reset" });
   });
 
   // Risk Radar
   app.get("/api/risk/map", (req, res) => {
     const updatedLGAs = LGAS.map((lga) => {
-      if (lga.id === "ikeja" && simulationState.status === "active") {
+      const incident = simulationState.activeIncidents.find(inc => inc.lgaId === lga.id);
+      if (incident && simulationState.status === "active") {
         return { ...lga, risk: 87, timeToBreach: "42m" };
       }
-      if (lga.id === "ikeja" && simulationState.status === "mitigating") {
+      if (incident && simulationState.status === "mitigating") {
         return { ...lga, risk: 45, timeToBreach: "125m" };
       }
-      if (lga.id === "ikeja" && simulationState.status === "recovered") {
+      if (incident && simulationState.status === "recovered") {
         return { ...lga, risk: 42, timeToBreach: "N/A" };
       }
       return lga;
@@ -74,9 +75,12 @@ async function startServer() {
 
   // Incident Panel
   app.get("/api/incidents/:id", (req, res) => {
-    if (simulationState.status === "idle") {
-      return res.status(404).json({ error: "No active incident" });
+    const incident = simulationState.activeIncidents.find(inc => inc.id === req.params.id);
+    if (!incident) {
+      return res.status(404).json({ error: "No such incident" });
     }
+    const lga = LGAS.find(l => l.id === incident.lgaId);
+    const lgaName = lga ? lga.name : "Unknown";
     res.json({
       id: req.params.id,
       cause: "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
@@ -88,7 +92,7 @@ async function startServer() {
       nccExposure: "Critical (Tier 1 Violation)",
       phase: simulationState.status === "recovered" ? "recovery" : "active",
       timeline: [
-        { time: "22:04", event: "Anomalous latency detected on Ikeja Node-4" },
+        { time: "22:04", event: `Anomalous latency detected on ${lgaName} Node-4` },
         { time: "22:06", event: "Packet loss exceeded 15% threshold" },
         { time: "22:08", event: "Incident triggered: NCC Alert Level Orange" },
       ]
@@ -98,9 +102,12 @@ async function startServer() {
   // Copilot Panel
   app.post("/api/copilot/query", (req, res) => {
     const { role, query } = req.body;
+    const firstIncident = simulationState.activeIncidents[0];
+    const lga = firstIncident ? LGAS.find(l => l.id === firstIncident.lgaId) : null;
+    const lgaName = lga ? lga.name : "Ikeja";
     res.json({
-      facts: "Ikeja Node-4 is currently experiencing 85% packet loss. Primary fiber link is unresponsive. Enterprise traffic is down for 840 accounts.",
-      inferences: "The issue likely stems from a physical fiber cut 2km from the Ikeja central exchange. Redundancy failing due to power surge on secondary route switch.",
+      facts: `${lgaName} Node-4 is currently experiencing 85% packet loss. Primary fiber link is unresponsive. Enterprise traffic is down for 840 accounts.`,
+      inferences: `The issue likely stems from a physical fiber cut 2km from the ${lgaName} central exchange. Redundancy failing due to power surge on secondary route switch.`,
       recommendations: "1. Divert traffic via Lagos-Island microwave link. 2. Dispatch technical crew to Zone 5. 3. Notify enterprise clients with SLA credit buffer.",
       tools_called: ["node_diagnostics", "power_log_analysis", "sla_impact_model"],
       validation_status: "Verified by Core Systems"
@@ -147,13 +154,16 @@ async function startServer() {
 
   // Compliance Pack
   app.get("/api/compliance/pack/:id", (req, res) => {
+    const incident = simulationState.activeIncidents.find(inc => inc.id === req.params.id);
+    const lga = incident ? LGAS.find(l => l.id === incident.lgaId) : null;
+    const siteCode = lga ? `Site-${incident.lgaId.toUpperCase()}-4` : "Site-IK-4";
     res.json({
       timeline: "2026-05-02T22:04:00Z - 22:15:00Z",
       affectedServices: ["Data", "VoIP", "Enterprise MPLS"],
       kpis: "Uptime: 14% | Latency: 450ms | Packet Loss: 85%",
       impactedSubscribers: 124500,
       rootCause: "Physical fiber cut accompanied by logic failure on secondary failover controller.",
-      correctiveActions: "Rerouted via Microwave Link; Replaced faulty edge switch at Site-IK-4.",
+      correctiveActions: `Rerouted via Microwave Link; Replaced faulty edge switch at ${siteCode}.`,
       evidenceLogs: "Log-ID: 772-AX | Sensor: Optical_Loss_High | Action: Failover_Triggered"
     });
   });
