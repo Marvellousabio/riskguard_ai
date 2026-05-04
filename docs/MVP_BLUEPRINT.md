@@ -25,7 +25,6 @@ sequenceDiagram
     participant API as API & State
     participant ENG as Risk Engine
     participant COP as Copilot
-
     Op->>FE: Open dashboard (baseline green)
     Op->>FE: Start stream + Trigger Ikeja
     FE->>API: POST /simulation/trigger/ikeja
