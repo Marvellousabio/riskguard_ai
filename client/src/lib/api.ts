@@ -43,8 +43,339 @@ const LGAS = [
   { id: "oshodi", name: "Oshodi", risk: 16, timeToBreach: "N/A" },
   { id: "shomolu", name: "Shomolu", risk: 13, timeToBreach: "N/A" },
   { id: "surulere", name: "Surulere", risk: 15, timeToBreach: "N/A" },
-  { id: "yaba", name: "Yaba", risk: 17, timeToBreach: "N/A" },
+  { id: "yaba", name: "Yaba", risk: 17, timeToBreach: "N/A"   },
 ];
+
+const mockIncidents: Record<string, Incident> = {
+  agege: {
+    id: "INC-AGEGE-001",
+    cause: "Power Supply Failure - Grid Transformer Overload",
+    riskScore: 82,
+    timeToBreach: "35m",
+    affectedSubscribers: 87500,
+    enterpriseLines: 456,
+    revenueAtRisk: "$8,750/hr",
+    nccExposure: "High (Tier 2 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "21:45", event: "Voltage fluctuations detected at Agege Central Substation" },
+      { time: "21:52", event: "Transformer temperature exceeded 85°C threshold" },
+      { time: "21:58", event: "Emergency generator failed to engage automatically" },
+      { time: "22:02", event: "Incident triggered: NCC Alert Level Yellow" },
+      { time: "22:08", event: "Backup power source activated manually" }
+    ]
+  },
+  alimosho: {
+    id: "INC-ALIMOSHO-001",
+    cause: "Cable Theft - Copper Wire Vandals",
+    riskScore: 89,
+    timeToBreach: "28m",
+    affectedSubscribers: 156200,
+    enterpriseLines: 892,
+    revenueAtRisk: "$15,620/hr",
+    nccExposure: "Critical (Tier 1 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "22:15", event: "Signal loss detected on Alimosho feeder line" },
+      { time: "22:18", event: "Ground crew reported cable damage 3km from exchange" },
+      { time: "22:22", event: "Security cameras captured vandalism incident" },
+      { time: "22:25", event: "Incident triggered: NCC Alert Level Red" },
+      { time: "22:30", event: "Emergency fiber restoration team dispatched" }
+    ]
+  },
+  apapa: {
+    id: "INC-APAPA-001",
+    cause: "Port Crane Accident - Heavy Equipment Damage",
+    riskScore: 91,
+    timeToBreach: "22m",
+    affectedSubscribers: 98400,
+    enterpriseLines: 1247,
+    revenueAtRisk: "$18,480/hr",
+    nccExposure: "Critical (Tier 1 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "21:30", event: "Container crane malfunction reported at APM Terminal" },
+      { time: "21:35", event: "Fiber optic cables severed by falling container" },
+      { time: "21:40", event: "Port operations suspended pending safety inspection" },
+      { time: "21:45", event: "Incident triggered: NCC Alert Level Red" },
+      { time: "22:00", event: "Alternative routing established via satellite link" }
+    ]
+  },
+  badagry: {
+    id: "INC-BADAGRY-001",
+    cause: "Weather Related - Heavy Rain Flooding",
+    riskScore: 65,
+    timeToBreach: "85m",
+    affectedSubscribers: 32100,
+    enterpriseLines: 89,
+    revenueAtRisk: "$3,210/hr",
+    nccExposure: "Medium (Tier 3 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "23:10", event: "Heavy rainfall detected in Badagry area" },
+      { time: "23:15", event: "Water ingress reported at underground junction box" },
+      { time: "23:20", event: "Lightning strike damaged surge protector" },
+      { time: "23:25", event: "Incident triggered: NCC Alert Level Yellow" },
+      { time: "23:35", event: "Drainage team dispatched to clear water accumulation" }
+    ]
+  },
+  epe: {
+    id: "INC-EPE-001",
+    cause: "Undersea Cable Fault - Marine Activity",
+    riskScore: 78,
+    timeToBreach: "52m",
+    affectedSubscribers: 45200,
+    enterpriseLines: 234,
+    revenueAtRisk: "$6,780/hr",
+    nccExposure: "High (Tier 2 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "20:45", event: "Subsea cable monitoring system reported anomalies" },
+      { time: "20:50", event: "Signal degradation detected on Epe-Lagos underwater link" },
+      { time: "20:55", event: "Marine vessel activity confirmed in cable zone" },
+      { time: "21:00", event: "Incident triggered: NCC Alert Level Orange" },
+      { time: "21:15", event: "Divers deployed for underwater cable inspection" }
+    ]
+  },
+  eti_osa: {
+    id: "INC-ETI_OSA-001",
+    cause: "VIP Area Congestion - Event Overload",
+    riskScore: 94,
+    timeToBreach: "18m",
+    affectedSubscribers: 187600,
+    enterpriseLines: 2156,
+    revenueAtRisk: "$28,140/hr",
+    nccExposure: "Critical (Tier 1 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "19:00", event: "Massive data surge detected in Eti-Osa district" },
+      { time: "19:05", event: "VIP event at Eko Atlantic caused bandwidth saturation" },
+      { time: "19:10", event: "DDoS-like traffic patterns identified" },
+      { time: "19:15", event: "Incident triggered: NCC Alert Level Red" },
+      { time: "19:25", event: "Emergency bandwidth allocation from reserve pools" }
+    ]
+  },
+  ibeju_lekki: {
+    id: "INC-IBEJU_LEKKI-001",
+    cause: "Construction Damage - Road Works",
+    riskScore: 58,
+    timeToBreach: "95m",
+    affectedSubscribers: 28600,
+    enterpriseLines: 145,
+    revenueAtRisk: "$2,860/hr",
+    nccExposure: "Low (Tier 4 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "14:30", event: "Road construction crew damaged overhead cables" },
+      { time: "14:35", event: "Fiber optic strands severed by excavator" },
+      { time: "14:40", event: "Local traffic disruption reported" },
+      { time: "14:45", event: "Incident triggered: NCC Alert Level Yellow" },
+      { time: "15:00", event: "Temporary wireless backup established" }
+    ]
+  },
+  ifako_ijaiye: {
+    id: "INC-IFAKO_IJAIYE-001",
+    cause: "Equipment Failure - Router Overheating",
+    riskScore: 72,
+    timeToBreach: "68m",
+    affectedSubscribers: 72300,
+    enterpriseLines: 378,
+    revenueAtRisk: "$7,230/hr",
+    nccExposure: "Medium (Tier 3 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "16:20", event: "Temperature sensors reported overheating in Ifako-Ijaiye exchange" },
+      { time: "16:25", event: "Router CPU utilization exceeded 95%" },
+      { time: "16:30", event: "Automatic failover failed due to configuration error" },
+      { time: "16:35", event: "Incident triggered: NCC Alert Level Orange" },
+      { time: "16:45", event: "Cooling system maintenance crew dispatched" }
+    ]
+  },
+  ikeja: {
+    id: "INC-IKEJA-001",
+    cause: "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    riskScore: 87,
+    timeToBreach: "42m",
+    affectedSubscribers: 145800,
+    enterpriseLines: 967,
+    revenueAtRisk: "$14,580/hr",
+    nccExposure: "Critical (Tier 1 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "22:04", event: "Anomalous latency detected on Ikeja Node-4" },
+      { time: "22:06", event: "Packet loss exceeded 15% threshold" },
+      { time: "22:08", event: "Incident triggered: NCC Alert Level Orange" },
+      { time: "22:12", event: "Redundancy systems engaged automatically" },
+      { time: "22:18", event: "Microwave backup link activated" }
+    ]
+  },
+  ikorodu: {
+    id: "INC-IKORODU-001",
+    cause: "Animal Damage - Rodent Infestation",
+    riskScore: 69,
+    timeToBreach: "78m",
+    affectedSubscribers: 56800,
+    enterpriseLines: 267,
+    revenueAtRisk: "$5,680/hr",
+    nccExposure: "Medium (Tier 3 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "03:15", event: "Cable damage detected in underground duct" },
+      { time: "03:20", event: "Rodent activity confirmed by inspection camera" },
+      { time: "03:25", event: "Multiple fiber strands chewed through" },
+      { time: "03:30", event: "Incident triggered: NCC Alert Level Yellow" },
+      { time: "03:45", event: "Pest control team dispatched for eradication" }
+    ]
+  },
+  kosofe: {
+    id: "INC-KOSOFE-001",
+    cause: "Software Bug - Routing Protocol Flap",
+    riskScore: 76,
+    timeToBreach: "58m",
+    affectedSubscribers: 89400,
+    enterpriseLines: 523,
+    revenueAtRisk: "$8,940/hr",
+    nccExposure: "High (Tier 2 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "11:30", event: "BGP routing instability detected in Kosofe network" },
+      { time: "11:35", event: "Route flapping causing intermittent connectivity" },
+      { time: "11:40", event: "Software update deployment identified as cause" },
+      { time: "11:45", event: "Incident triggered: NCC Alert Level Orange" },
+      { time: "12:00", event: "Emergency rollback to previous software version" }
+    ]
+  },
+  lagos_island: {
+    id: "INC-LAGOS_ISLAND-001",
+    cause: "Multiple Failures - Cascading Outage",
+    riskScore: 95,
+    timeToBreach: "15m",
+    affectedSubscribers: 203400,
+    enterpriseLines: 1847,
+    revenueAtRisk: "$30,510/hr",
+    nccExposure: "Critical (Tier 1 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "08:00", event: "Primary power failure at Lagos Island central exchange" },
+      { time: "08:05", event: "Backup generator failed to start" },
+      { time: "08:10", event: "Cooling system shutdown caused equipment overheating" },
+      { time: "08:15", event: "Incident triggered: NCC Alert Level Red" },
+      { time: "08:25", event: "Emergency evacuation of data center initiated" }
+    ]
+  },
+  lagos_mainland: {
+    id: "INC-LAGOS_MAINLAND-001",
+    cause: "Human Error - Configuration Change",
+    riskScore: 83,
+    timeToBreach: "48m",
+    affectedSubscribers: 167300,
+    enterpriseLines: 1234,
+    revenueAtRisk: "$16,730/hr",
+    nccExposure: "High (Tier 2 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "13:20", event: "Network configuration change deployed by mistake" },
+      { time: "13:25", event: "ACL rules blocked legitimate traffic" },
+      { time: "13:30", event: "Change management protocol violated" },
+      { time: "13:35", event: "Incident triggered: NCC Alert Level Orange" },
+      { time: "13:45", event: "Configuration rollback initiated" }
+    ]
+  },
+  mushin: {
+    id: "INC-MUSHIN-001",
+    cause: "Fire Incident - Electrical Fault",
+    riskScore: 88,
+    timeToBreach: "38m",
+    affectedSubscribers: 112600,
+    enterpriseLines: 678,
+    revenueAtRisk: "$11,260/hr",
+    nccExposure: "Critical (Tier 1 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "17:45", event: "Smoke detected in Mushin equipment room" },
+      { time: "17:48", event: "Automatic fire suppression system activated" },
+      { time: "17:50", event: "Electrical fire caused by faulty wiring" },
+      { time: "17:52", event: "Incident triggered: NCC Alert Level Red" },
+      { time: "18:00", event: "Fire department arrived on scene" },
+      { time: "18:15", event: "Water damage assessment initiated" }
+    ]
+  },
+  oshodi: {
+    id: "INC-OSHODI-001",
+    cause: "Traffic Accident - Utility Pole Collision",
+    riskScore: 81,
+    timeToBreach: "50m",
+    affectedSubscribers: 138900,
+    enterpriseLines: 756,
+    revenueAtRisk: "$13,890/hr",
+    nccExposure: "Critical (Tier 1 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "07:30", event: "Commercial vehicle collided with utility pole" },
+      { time: "07:32", event: "Overhead fiber cables severed by impact" },
+      { time: "07:35", event: "Emergency services responded to accident scene" },
+      { time: "07:37", event: "Incident triggered: NCC Alert Level Red" },
+      { time: "07:45", event: "Traffic diversion implemented by local authorities" },
+      { time: "08:00", event: "Temporary cable repair completed" }
+    ]
+  },
+  shomolu: {
+    id: "INC-SHOMOLU-001",
+    cause: "Hardware Failure - Switch Failure",
+    riskScore: 74,
+    timeToBreach: "62m",
+    affectedSubscribers: 76200,
+    enterpriseLines: 423,
+    revenueAtRisk: "$7,620/hr",
+    nccExposure: "Medium (Tier 3 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "10:15", event: "Core switch failed in Shomolu data center" },
+      { time: "10:20", event: "Redundant switch failed simultaneously" },
+      { time: "10:25", event: "Hardware diagnostics revealed manufacturing defect" },
+      { time: "10:30", event: "Incident triggered: NCC Alert Level Orange" },
+      { time: "10:45", event: "Hot swap replacement initiated" }
+    ]
+  },
+  surulere: {
+    id: "INC-SURULERE-001",
+    cause: "Cyber Attack - DDoS Assault",
+    riskScore: 92,
+    timeToBreach: "25m",
+    affectedSubscribers: 129400,
+    enterpriseLines: 891,
+    revenueAtRisk: "$12,940/hr",
+    nccExposure: "Critical (Tier 1 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "04:00", event: "Unusual traffic patterns detected globally" },
+      { time: "04:05", event: "DDoS attack confirmed targeting Surulere infrastructure" },
+      { time: "04:10", event: "Traffic volume exceeded 10Gbps threshold" },
+      { time: "04:15", event: "Incident triggered: NCC Alert Level Red" },
+      { time: "04:25", event: "DDoS mitigation systems activated" },
+      { time: "04:40", event: "Attack source tracing initiated" }
+    ]
+  },
+  yaba: {
+    id: "INC-YABA-001",
+    cause: "Building Collapse - Structural Damage",
+    riskScore: 79,
+    timeToBreach: "54m",
+    affectedSubscribers: 95600,
+    enterpriseLines: 567,
+    revenueAtRisk: "$9,560/hr",
+    nccExposure: "High (Tier 2 Violation)",
+    phase: "active",
+    timeline: [
+      { time: "12:30", event: "Building collapse reported in Yaba commercial district" },
+      { time: "12:32", event: "Underground fiber ducts crushed by debris" },
+      { time: "12:35", event: "Emergency rescue operations commenced" },
+      { time: "12:37", event: "Incident triggered: NCC Alert Level Red" },
+      { time: "13:00", event: "Structural engineers assessed damage extent" },
+      { time: "13:15", event: "Cable recovery operations planned" }
+    ]
+  }
+};
 
 const mockApi = {
   get: (url: string) => {
@@ -92,340 +423,203 @@ const mockApi = {
         const riskScore = simulationState.status === "active" ? 87 : (simulationState.status === "mitigating" ? 45 : 24);
         const timeToBreach = simulationState.status === "active" ? "42m" : (simulationState.status === "mitigating" ? "125m" : "N/A");
 
-        const mockIncidents: Record<string, Incident> = {
-        agege: {
-          id: "INC-AGEGE-001",
-          cause: "Power Supply Failure - Grid Transformer Overload",
-          riskScore: 82,
-          timeToBreach: "35m",
-          affectedSubscribers: 87500,
-          enterpriseLines: 456,
-          revenueAtRisk: "$8,750/hr",
-          nccExposure: "High (Tier 2 Violation)",
-          phase,
-          timeline: [
-            { time: "21:45", event: "Voltage fluctuations detected at Agege Central Substation" },
-            { time: "21:52", event: "Transformer temperature exceeded 85°C threshold" },
-            { time: "21:58", event: "Emergency generator failed to engage automatically" },
-            { time: "22:02", event: "Incident triggered: NCC Alert Level Yellow" },
-            { time: "22:08", event: "Backup power source activated manually" }
-          ]
-        },
-        alimosho: {
-          id: "INC-ALIMOSHO-001",
-          cause: "Cable Theft - Copper Wire Vandals",
-          riskScore: 89,
-          timeToBreach: "28m",
-          affectedSubscribers: 156200,
-          enterpriseLines: 892,
-          revenueAtRisk: "$15,620/hr",
-          nccExposure: "Critical (Tier 1 Violation)",
-          phase,
-          timeline: [
-            { time: "22:15", event: "Signal loss detected on Alimosho feeder line" },
-            { time: "22:18", event: "Ground crew reported cable damage 3km from exchange" },
-            { time: "22:22", event: "Security cameras captured vandalism incident" },
-            { time: "22:25", event: "Incident triggered: NCC Alert Level Red" },
-            { time: "22:30", event: "Emergency fiber restoration team dispatched" }
-          ]
-        },
-        apapa: {
-          id: "INC-APAPA-001",
-          cause: "Port Crane Accident - Heavy Equipment Damage",
-          riskScore: 91,
-          timeToBreach: "22m",
-          affectedSubscribers: 98400,
-          enterpriseLines: 1247,
-          revenueAtRisk: "$18,480/hr",
-          nccExposure: "Critical (Tier 1 Violation)",
-          phase,
-          timeline: [
-            { time: "21:30", event: "Container crane malfunction reported at APM Terminal" },
-            { time: "21:35", event: "Fiber optic cables severed by falling container" },
-            { time: "21:40", event: "Port operations suspended pending safety inspection" },
-            { time: "21:45", event: "Incident triggered: NCC Alert Level Red" },
-            { time: "22:00", event: "Alternative routing established via satellite link" }
-          ]
-        },
-        badagry: {
-          id: "INC-BADAGRY-001",
-          cause: "Weather Related - Heavy Rain Flooding",
-          riskScore: 65,
-          timeToBreach: "85m",
-          affectedSubscribers: 32100,
-          enterpriseLines: 89,
-          revenueAtRisk: "$3,210/hr",
-          nccExposure: "Medium (Tier 3 Violation)",
-          phase,
-          timeline: [
-            { time: "23:10", event: "Heavy rainfall detected in Badagry area" },
-            { time: "23:15", event: "Water ingress reported at underground junction box" },
-            { time: "23:20", event: "Lightning strike damaged surge protector" },
-            { time: "23:25", event: "Incident triggered: NCC Alert Level Yellow" },
-            { time: "23:35", event: "Drainage team dispatched to clear water accumulation" }
-          ]
-        },
-        epe: {
-          id: "INC-EPE-001",
-          cause: "Undersea Cable Fault - Marine Activity",
-          riskScore: 78,
-          timeToBreach: "52m",
-          affectedSubscribers: 45200,
-          enterpriseLines: 234,
-          revenueAtRisk: "$6,780/hr",
-          nccExposure: "High (Tier 2 Violation)",
-          phase,
-          timeline: [
-            { time: "20:45", event: "Subsea cable monitoring system reported anomalies" },
-            { time: "20:50", event: "Signal degradation detected on Epe-Lagos underwater link" },
-            { time: "20:55", event: "Marine vessel activity confirmed in cable zone" },
-            { time: "21:00", event: "Incident triggered: NCC Alert Level Orange" },
-            { time: "21:15", event: "Divers deployed for underwater cable inspection" }
-          ]
-        },
-        eti_osa: {
-          id: "INC-ETI_OSA-001",
-          cause: "VIP Area Congestion - Event Overload",
-          riskScore: 94,
-          timeToBreach: "18m",
-          affectedSubscribers: 187600,
-          enterpriseLines: 2156,
-          revenueAtRisk: "$28,140/hr",
-          nccExposure: "Critical (Tier 1 Violation)",
-          phase,
-          timeline: [
-            { time: "19:00", event: "Massive data surge detected in Eti-Osa district" },
-            { time: "19:05", event: "VIP event at Eko Atlantic caused bandwidth saturation" },
-            { time: "19:10", event: "DDoS-like traffic patterns identified" },
-            { time: "19:15", event: "Incident triggered: NCC Alert Level Red" },
-            { time: "19:25", event: "Emergency bandwidth allocation from reserve pools" }
-          ]
-        },
-        ibeju_lekki: {
-          id: "INC-IBEJU_LEKKI-001",
-          cause: "Construction Damage - Road Works",
-          riskScore: 58,
-          timeToBreach: "95m",
-          affectedSubscribers: 28600,
-          enterpriseLines: 145,
-          revenueAtRisk: "$2,860/hr",
-          nccExposure: "Low (Tier 4 Violation)",
-          phase,
-          timeline: [
-            { time: "14:30", event: "Road construction crew damaged overhead cables" },
-            { time: "14:35", event: "Fiber optic strands severed by excavator" },
-            { time: "14:40", event: "Local traffic disruption reported" },
-            { time: "14:45", event: "Incident triggered: NCC Alert Level Yellow" },
-            { time: "15:00", event: "Temporary wireless backup established" }
-          ]
-        },
-        ifako_ijaiye: {
-          id: "INC-IFAKO_IJAIYE-001",
-          cause: "Equipment Failure - Router Overheating",
-          riskScore: 72,
-          timeToBreach: "68m",
-          affectedSubscribers: 72300,
-          enterpriseLines: 378,
-          revenueAtRisk: "$7,230/hr",
-          nccExposure: "Medium (Tier 3 Violation)",
-          phase,
-          timeline: [
-            { time: "16:20", event: "Temperature sensors reported overheating in Ifako-Ijaiye exchange" },
-            { time: "16:25", event: "Router CPU utilization exceeded 95%" },
-            { time: "16:30", event: "Automatic failover failed due to configuration error" },
-            { time: "16:35", event: "Incident triggered: NCC Alert Level Orange" },
-            { time: "16:45", event: "Cooling system maintenance crew dispatched" }
-          ]
-        },
-        ikeja: {
-          id: "INC-IKEJA-001",
-          cause: "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
-          riskScore: 87,
-          timeToBreach: "42m",
-          affectedSubscribers: 145800,
-          enterpriseLines: 967,
-          revenueAtRisk: "$14,580/hr",
-          nccExposure: "Critical (Tier 1 Violation)",
-          phase,
-          timeline: [
-            { time: "22:04", event: "Anomalous latency detected on Ikeja Node-4" },
-            { time: "22:06", event: "Packet loss exceeded 15% threshold" },
-            { time: "22:08", event: "Incident triggered: NCC Alert Level Orange" },
-            { time: "22:12", event: "Redundancy systems engaged automatically" },
-            { time: "22:18", event: "Microwave backup link activated" }
-          ]
-        },
-        ikorodu: {
-          id: "INC-IKORODU-001",
-          cause: "Animal Damage - Rodent Infestation",
-          riskScore: 69,
-          timeToBreach: "78m",
-          affectedSubscribers: 56800,
-          enterpriseLines: 267,
-          revenueAtRisk: "$5,680/hr",
-          nccExposure: "Medium (Tier 3 Violation)",
-          phase,
-          timeline: [
-            { time: "03:15", event: "Cable damage detected in underground duct" },
-            { time: "03:20", event: "Rodent activity confirmed by inspection camera" },
-            { time: "03:25", event: "Multiple fiber strands chewed through" },
-            { time: "03:30", event: "Incident triggered: NCC Alert Level Yellow" },
-            { time: "03:45", event: "Pest control team dispatched for eradication" }
-          ]
-        },
-        kosofe: {
-          id: "INC-KOSOFE-001",
-          cause: "Software Bug - Routing Protocol Flap",
-          riskScore: 76,
-          timeToBreach: "58m",
-          affectedSubscribers: 89400,
-          enterpriseLines: 523,
-          revenueAtRisk: "$8,940/hr",
-          nccExposure: "High (Tier 2 Violation)",
-          phase,
-          timeline: [
-            { time: "11:30", event: "BGP routing instability detected in Kosofe network" },
-            { time: "11:35", event: "Route flapping causing intermittent connectivity" },
-            { time: "11:40", event: "Software update deployment identified as cause" },
-            { time: "11:45", event: "Incident triggered: NCC Alert Level Orange" },
-            { time: "12:00", event: "Emergency rollback to previous software version" }
-          ]
-        },
-        lagos_island: {
-          id: "INC-LAGOS_ISLAND-001",
-          cause: "Multiple Failures - Cascading Outage",
-          riskScore: 95,
-          timeToBreach: "15m",
-          affectedSubscribers: 203400,
-          enterpriseLines: 1847,
-          revenueAtRisk: "$30,510/hr",
-          nccExposure: "Critical (Tier 1 Violation)",
-          phase,
-          timeline: [
-            { time: "08:00", event: "Primary power failure at Lagos Island central exchange" },
-            { time: "08:05", event: "Backup generator failed to start" },
-            { time: "08:10", event: "Cooling system shutdown caused equipment overheating" },
-            { time: "08:15", event: "Incident triggered: NCC Alert Level Red" },
-            { time: "08:25", event: "Emergency evacuation of data center initiated" }
-          ]
-        },
-        lagos_mainland: {
-          id: "INC-LAGOS_MAINLAND-001",
-          cause: "Human Error - Configuration Change",
-          riskScore: 83,
-          timeToBreach: "48m",
-          affectedSubscribers: 167300,
-          enterpriseLines: 1234,
-          revenueAtRisk: "$16,730/hr",
-          nccExposure: "High (Tier 2 Violation)",
-          phase,
-          timeline: [
-            { time: "13:20", event: "Network configuration change deployed by mistake" },
-            { time: "13:25", event: "ACL rules blocked legitimate traffic" },
-            { time: "13:30", event: "Change management protocol violated" },
-            { time: "13:35", event: "Incident triggered: NCC Alert Level Orange" },
-            { time: "13:45", event: "Configuration rollback initiated" }
-          ]
-        },
-        mushin: {
-          id: "INC-MUSHIN-001",
-          cause: "Fire Incident - Electrical Fault",
-          riskScore: 88,
-          timeToBreach: "38m",
-          affectedSubscribers: 112600,
-          enterpriseLines: 678,
-          revenueAtRisk: "$11,260/hr",
-          nccExposure: "Critical (Tier 1 Violation)",
-          phase,
-          timeline: [
-            { time: "17:45", event: "Smoke detected in Mushin equipment room" },
-            { time: "17:48", event: "Automatic fire suppression system activated" },
-            { time: "17:50", event: "Electrical fire caused by faulty wiring" },
-            { time: "17:52", event: "Incident triggered: NCC Alert Level Red" },
-            { time: "18:00", event: "Fire department arrived on scene" },
-            { time: "18:15", event: "Water damage assessment initiated" }
-          ]
-        },
-        oshodi: {
-          id: "INC-OSHODI-001",
-          cause: "Traffic Accident - Utility Pole Collision",
-          riskScore: 81,
-          timeToBreach: "50m",
-          affectedSubscribers: 138900,
-          enterpriseLines: 756,
-          revenueAtRisk: "$13,890/hr",
-          nccExposure: "Critical (Tier 1 Violation)",
-          phase,
-          timeline: [
-            { time: "07:30", event: "Commercial vehicle collided with utility pole" },
-            { time: "07:32", event: "Overhead fiber cables severed by impact" },
-            { time: "07:35", event: "Emergency services responded to accident scene" },
-            { time: "07:37", event: "Incident triggered: NCC Alert Level Red" },
-            { time: "07:45", event: "Traffic diversion implemented by local authorities" },
-            { time: "08:00", event: "Temporary cable repair completed" }
-          ]
-        },
-        shomolu: {
-          id: "INC-SHOMOLU-001",
-          cause: "Hardware Failure - Switch Failure",
-          riskScore: 74,
-          timeToBreach: "62m",
-          affectedSubscribers: 76200,
-          enterpriseLines: 423,
-          revenueAtRisk: "$7,620/hr",
-          nccExposure: "Medium (Tier 3 Violation)",
-          phase,
-          timeline: [
-            { time: "10:15", event: "Core switch failed in Shomolu data center" },
-            { time: "10:20", event: "Redundant switch failed simultaneously" },
-            { time: "10:25", event: "Hardware diagnostics revealed manufacturing defect" },
-            { time: "10:30", event: "Incident triggered: NCC Alert Level Orange" },
-            { time: "10:45", event: "Hot swap replacement initiated" }
-          ]
-        },
-        surulere: {
-          id: "INC-SURULERE-001",
-          cause: "Cyber Attack - DDoS Assault",
-          riskScore: 92,
-          timeToBreach: "25m",
-          affectedSubscribers: 129400,
-          enterpriseLines: 891,
-          revenueAtRisk: "$12,940/hr",
-          nccExposure: "Critical (Tier 1 Violation)",
-          phase,
-          timeline: [
-            { time: "04:00", event: "Unusual traffic patterns detected globally" },
-            { time: "04:05", event: "DDoS attack confirmed targeting Surulere infrastructure" },
-            { time: "04:10", event: "Traffic volume exceeded 10Gbps threshold" },
-            { time: "04:15", event: "Incident triggered: NCC Alert Level Red" },
-            { time: "04:25", event: "DDoS mitigation systems activated" },
-            { time: "04:40", event: "Attack source tracing initiated" }
-          ]
-        },
-        yaba: {
-          id: "INC-YABA-001",
-          cause: "Building Collapse - Structural Damage",
-          riskScore: 79,
-          timeToBreach: "54m",
-          affectedSubscribers: 95600,
-          enterpriseLines: 567,
-          revenueAtRisk: "$9,560/hr",
-          nccExposure: "High (Tier 2 Violation)",
-          phase,
-          timeline: [
-            { time: "12:30", event: "Building collapse reported in Yaba commercial district" },
-            { time: "12:32", event: "Underground fiber ducts crushed by debris" },
-            { time: "12:35", event: "Emergency rescue operations commenced" },
-            { time: "12:37", event: "Incident triggered: NCC Alert Level Red" },
-            { time: "13:00", event: "Structural engineers assessed damage extent" },
-            { time: "13:15", event: "Cable recovery operations planned" }
-          ]
-        }
-      };
+
         return Promise.resolve({ data: mockIncidents[lgaId || "ikeja"] || mockIncidents.ikeja });
       } catch (e) {
         console.error('Error in /incidents endpoint:', e);
         return Promise.reject(new Error('Failed to load incident data'));
+      }
+    }
+    if (url.startsWith("/compliance/pack/")) {
+      try {
+        const incidentId = url.split("/compliance/pack/")[1];
+        const lgaId = incidentId?.split("-")[1]?.toLowerCase();
+        const mockCompliancePacks: Record<string, CompliancePack> = {
+          agege: {
+            lgaName: "Agege",
+            timeline: "21:45 - Voltage fluctuations detected\n21:52 - Transformer temperature exceeded 85°C\n21:58 - Emergency generator failed to engage\n22:02 - Incident triggered: NCC Alert Level Yellow\n22:08 - Backup power source activated manually",
+            affectedServices: ["Voice Services", "Data Services", "Internet Access", "Enterprise MPLS"],
+            kpis: "Service Availability: 0%\nPacket Loss: 100%\nLatency: N/A\nThroughput: 0 Mbps\nAffected Subscribers: 87,500",
+            impactedSubscribers: 87500,
+            rootCause: "Power Supply Failure - Grid Transformer Overload causing complete power failure at Agege Central Substation. Backup generators failed to engage automatically due to maintenance oversight.",
+            correctiveActions: "1. Deploy mobile generator units to restore power\n2. Implement rolling power restoration protocol\n3. Coordinate with electricity distribution company\n4. Perform preventive maintenance on backup systems",
+            evidenceLogs: "Thermal sensor logs: Transformer temp 95°C\nGenerator diagnostic: Fuel system failure\nVoltage monitor: Complete power loss at 21:45\nSecurity camera: Emergency protocols not followed"
+          },
+          alimosho: {
+            lgaName: "Alimosho",
+            timeline: "22:15 - Signal loss detected on Alimosho feeder line\n22:18 - Ground crew reported cable damage 3km from exchange\n22:22 - Security cameras captured vandalism incident\n22:25 - Incident triggered: NCC Alert Level Red\n22:30 - Emergency fiber restoration team dispatched",
+            affectedServices: ["Broadband Internet", "VoIP Services", "Enterprise Connectivity", "Mobile Backhaul"],
+            kpis: "Service Availability: 15%\nPacket Loss: 85%\nLatency: 250ms\nThroughput: 2 Mbps\nAffected Subscribers: 156,200",
+            impactedSubscribers: 156200,
+            rootCause: "Cable Theft - Copper Wire Vandals severed multiple fiber optic cables in Alimosho district. Coordinated vandalism targeting infrastructure corridors with organized criminal activity.",
+            correctiveActions: "1. Deploy armed security patrols to cable routes\n2. Establish temporary wireless mesh network\n3. File police report and coordinate with law enforcement\n4. Implement fiber optic cable burial program",
+            evidenceLogs: "Security footage: Organized vandalism at 22:22\nCable integrity monitor: Multiple strand breaks detected\nGround crew report: 3km cable damage confirmed\nTraffic analysis: 85% packet loss across all services"
+          },
+          apapa: {
+            lgaName: "Apapa",
+            timeline: "21:30 - Container crane malfunction reported at APM Terminal\n21:35 - Fiber optic cables severed by falling container\n21:40 - Port operations suspended pending safety inspection\n21:45 - Incident triggered: NCC Alert Level Red\n22:00 - Alternative routing established via satellite link",
+            affectedServices: ["Port Communications", "Shipping Systems", "Container Tracking", "Enterprise Services"],
+            kpis: "Service Availability: 25%\nPacket Loss: 75%\nLatency: 180ms\nThroughput: 5 Mbps\nAffected Subscribers: 98,400",
+            impactedSubscribers: 98400,
+            rootCause: "Port Crane Accident - Heavy Equipment Damage severed primary and backup fiber links at APM Terminal. Container crane malfunction caused falling debris damage to cable infrastructure.",
+            correctiveActions: "1. Establish satellite communication backup for port operations\n2. Coordinate with port authority for crane inspection\n3. Implement redundant cable routing around heavy machinery\n4. Develop incident response protocol for port-related damage",
+            evidenceLogs: "Port authority report: Crane malfunction at 21:30\nCable damage assessment: Both primary and backup links severed\nSatellite link activation: Alternative routing established at 22:00\nEconomic impact: $500K/hour port operation losses"
+          },
+          badagry: {
+            lgaName: "Badagry",
+            timeline: "23:10 - Heavy rainfall detected in Badagry area\n23:15 - Water ingress reported at underground junction box\n23:20 - Lightning strike damaged surge protector\n23:25 - Incident triggered: NCC Alert Level Yellow\n23:35 - Drainage team dispatched to clear water accumulation",
+            affectedServices: ["Residential Broadband", "Public WiFi", "Basic Voice Services"],
+            kpis: "Service Availability: 60%\nPacket Loss: 40%\nLatency: 95ms\nThroughput: 15 Mbps\nAffected Subscribers: 32,100",
+            impactedSubscribers: 32100,
+            rootCause: "Weather Related - Heavy Rain Flooding caused water ingress at underground junction boxes. Lightning strikes compounded damage to surge protection systems.",
+            correctiveActions: "1. Deploy weather monitoring and early warning systems\n2. Upgrade lightning protection across all infrastructure\n3. Implement flood-resistant cable routing\n4. Develop weather contingency plans with meteorological coordination",
+            evidenceLogs: "Weather station data: 150mm rainfall in 2 hours\nLightning detection: Multiple strikes recorded\nWater ingress sensors: Junction box flooding confirmed\nService restoration: Gradual recovery as water recedes"
+          },
+          epe: {
+            lgaName: "Epe",
+            timeline: "20:45 - Subsea cable monitoring system reported anomalies\n20:50 - Signal degradation detected on Epe-Lagos underwater link\n20:55 - Marine vessel activity confirmed in cable zone\n21:00 - Incident triggered: NCC Alert Level Orange\n21:15 - Divers deployed for underwater cable inspection",
+            affectedServices: ["Undersea Connectivity", "Coastal Broadband", "Maritime Communications"],
+            kpis: "Service Availability: 45%\nPacket Loss: 55%\nLatency: 320ms\nThroughput: 8 Mbps\nAffected Subscribers: 45,200",
+            impactedSubscribers: 45200,
+            rootCause: "Undersea Cable Fault - Marine Activity caused damage to underwater fiber optic cables off Epe coastline. Unauthorized vessel activity in protected cable zones.",
+            correctiveActions: "1. Deploy marine patrol vessels to cable protection zone\n2. Establish underwater cable monitoring buoys\n3. Coordinate with maritime authorities for vessel tracking\n4. Develop subsea cable burial and protection program",
+            evidenceLogs: "Underwater sensors: Cable integrity compromised\nVessel tracking: Unauthorized activity in protected zone\nSignal monitoring: Degradation started at 20:50\nDiver inspection: Physical damage to cable sheath confirmed"
+          },
+          eti_osa: {
+            lgaName: "Eti-Osa",
+            timeline: "19:00 - Massive data surge detected in Eti-Osa district\n19:05 - VIP event at Eko Atlantic caused bandwidth saturation\n19:10 - DDoS-like traffic patterns identified\n19:15 - Incident triggered: NCC Alert Level Red\n19:25 - Emergency bandwidth allocation from reserve pools",
+            affectedServices: ["High-Speed Broadband", "Enterprise Services", "Mobile Data", "Streaming Services"],
+            kpis: "Service Availability: 35%\nPacket Loss: 65%\nLatency: 280ms\nThroughput: 12 Mbps\nAffected Subscribers: 187,600",
+            impactedSubscribers: 187600,
+            rootCause: "VIP Area Congestion - Event Overload at Eko Atlantic development overwhelmed network infrastructure. Unplanned high-density event caused bandwidth saturation and service degradation.",
+            correctiveActions: "1. Implement dynamic bandwidth allocation for event zones\n2. Deploy additional capacity through satellite and microwave links\n3. Coordinate event planning with infrastructure capacity assessment\n4. Develop premium service tiers for high-density areas",
+            evidenceLogs: "Traffic analysis: 95% bandwidth utilization\nEvent monitoring: Eko Atlantic VIP event confirmed\nQoS systems: Emergency allocation activated\nCustomer complaints: Service degradation reports across all tiers"
+          },
+          ibeju_lekki: {
+            lgaName: "Ibeju-Lekki",
+            timeline: "14:30 - Road construction crew damaged overhead cables\n14:35 - Fiber optic strands severed by excavator\n14:40 - Local traffic disruption reported\n14:45 - Incident triggered: NCC Alert Level Yellow\n15:00 - Temporary wireless backup established",
+            affectedServices: ["Residential Internet", "Local Voice Services", "Community WiFi"],
+            kpis: "Service Availability: 70%\nPacket Loss: 30%\nLatency: 75ms\nThroughput: 20 Mbps\nAffected Subscribers: 28,600",
+            impactedSubscribers: 28600,
+            rootCause: "Construction Damage - Road Works caused excavator to sever overhead fiber optic cables. Construction coordination failure and inadequate cable marking contributed to incident.",
+            correctiveActions: "1. Implement construction permit coordination system\n2. Deploy underground cable conversion program\n3. Establish utility marking and protection standards\n4. Develop emergency response protocols for construction incidents",
+            evidenceLogs: "Construction permit: No utility marking coordination\nCable damage report: Multiple fiber strands severed\nTraffic monitoring: Local disruption confirmed\nWireless backup: Temporary service restored at 15:00"
+          },
+          ifako_ijaiye: {
+            lgaName: "Ifako-Ijaiye",
+            timeline: "16:20 - Temperature sensors reported overheating in Ifako-Ijaiye exchange\n16:25 - Router CPU utilization exceeded 95%\n16:30 - Automatic failover failed due to configuration error\n16:35 - Incident triggered: NCC Alert Level Orange\n16:45 - Cooling system maintenance crew dispatched",
+            affectedServices: ["Broadband Services", "Enterprise Connectivity", "VoIP Systems"],
+            kpis: "Service Availability: 55%\nPacket Loss: 45%\nLatency: 120ms\nThroughput: 18 Mbps\nAffected Subscribers: 72,300",
+            impactedSubscribers: 72300,
+            rootCause: "Equipment Failure - Router Overheating caused by cooling system failure and high ambient temperatures. Automatic failover systems failed due to configuration errors.",
+            correctiveActions: "1. Deploy emergency cooling systems to affected exchange\n2. Implement temperature monitoring and automated shutdown protocols\n3. Upgrade cooling infrastructure for climate resilience\n4. Develop predictive maintenance schedules based on usage patterns",
+            evidenceLogs: "Thermal sensors: Router temp exceeded 85°C\nCPU monitoring: 95% utilization sustained\nCooling system: Failure confirmed at 16:20\nConfiguration audit: Failover settings incorrect"
+          },
+          ikeja: {
+            lgaName: "Ikeja",
+            timeline: "22:04 - Anomalous latency detected on Ikeja Node-4\n22:06 - Packet loss exceeded 15% threshold\n22:08 - Incident triggered: NCC Alert Level Orange\n22:12 - Redundancy systems engaged automatically\n22:18 - Microwave backup link activated",
+            affectedServices: ["Core Network Services", "Internet Backbone", "Enterprise MPLS", "Mobile Networks"],
+            kpis: "Service Availability: 40%\nPacket Loss: 60%\nLatency: 200ms\nThroughput: 10 Mbps\nAffected Subscribers: 145,800",
+            impactedSubscribers: 145800,
+            rootCause: "Backbone Fiber Link Cut - Physical damage to primary and secondary fiber routes serving Ikeja Node-4. Likely construction or vandalism related cable severance.",
+            correctiveActions: "1. Activate microwave failover systems immediately\n2. Dispatch emergency repair crews to affected cable routes\n3. Implement automated traffic rerouting through alternative network paths\n4. Notify enterprise customers with SLA compensation protocols",
+            evidenceLogs: "Network monitoring: Latency spike at 22:04\nPacket analysis: 60% loss on primary routes\nRedundancy activation: Automatic failover at 22:12\nMicrowave link: Backup activated at 22:18"
+          },
+          ikorodu: {
+            lgaName: "Ikorodu",
+            timeline: "03:15 - Cable damage detected in underground duct\n03:20 - Rodent activity confirmed by inspection camera\n03:25 - Multiple fiber strands chewed through\n03:30 - Incident triggered: NCC Alert Level Yellow\n03:45 - Pest control team dispatched for eradication",
+            affectedServices: ["Residential Broadband", "Local Business Services", "Community Networks"],
+            kpis: "Service Availability: 65%\nPacket Loss: 35%\nLatency: 85ms\nThroughput: 22 Mbps\nAffected Subscribers: 56,800",
+            impactedSubscribers: 56800,
+            rootCause: "Animal Damage - Rodent Infestation caused damage to underground fiber optic cables. Environmental conditions favorable for rodent proliferation with inadequate cable protection.",
+            correctiveActions: "1. Deploy pest control specialists for comprehensive eradication\n2. Implement rodent-proof cable ducting systems\n3. Install pest monitoring and early warning systems\n4. Develop environmental controls for cable infrastructure",
+            evidenceLogs: "Inspection camera: Rodent activity confirmed\nCable damage assessment: Multiple fiber strands affected\nPest monitoring: Environmental conditions favorable\nService impact: Gradual degradation over 24 hours"
+          },
+          kosofe: {
+            lgaName: "Kosofe",
+            timeline: "11:30 - BGP routing instability detected in Kosofe network\n11:35 - Route flapping causing intermittent connectivity\n11:40 - Software update deployment identified as cause\n11:45 - Incident triggered: NCC Alert Level Orange\n12:00 - Emergency rollback to previous software version",
+            affectedServices: ["Internet Routing", "Enterprise WAN", "Cloud Connectivity"],
+            kpis: "Service Availability: 50%\nPacket Loss: 50%\nLatency: 150ms\nThroughput: 16 Mbps\nAffected Subscribers: 89,400",
+            impactedSubscribers: 89400,
+            rootCause: "Software Bug - Routing Protocol Flap caused by recent software update deployment. BGP route flapping created network instability and connectivity issues.",
+            correctiveActions: "1. Implement route dampening to stabilize BGP convergence\n2. Roll back recent configuration changes\n3. Deploy network segmentation to contain instability\n4. Conduct comprehensive routing protocol audit and testing",
+            evidenceLogs: "BGP monitoring: Route flapping detected\nSoftware deployment: Update installed at 11:00\nNetwork analysis: Instability correlated with update\nRollback execution: Previous version restored at 12:00"
+          },
+          lagos_island: {
+            lgaName: "Lagos Island",
+            timeline: "08:00 - Primary power failure at Lagos Island central exchange\n08:05 - Backup generator failed to start\n08:10 - Cooling system shutdown caused equipment overheating\n08:15 - Incident triggered: NCC Alert Level Red\n08:25 - Emergency evacuation of data center initiated",
+            affectedServices: ["Financial Services", "Government Networks", "Enterprise Critical Systems", "Stock Exchange"],
+            kpis: "Service Availability: 5%\nPacket Loss: 95%\nLatency: N/A\nThroughput: 1 Mbps\nAffected Subscribers: 203,400",
+            impactedSubscribers: 203400,
+            rootCause: "Multiple Failures - Cascading Outage from primary power failure compounded by backup system failures and cooling system shutdown. Critical infrastructure single point of failure.",
+            correctiveActions: "1. Establish emergency command center with redundant power\n2. Implement geographic distribution of critical infrastructure\n3. Develop comprehensive disaster recovery protocols\n4. Coordinate with emergency services for priority restoration",
+            evidenceLogs: "Power monitoring: Complete failure at 08:00\nGenerator diagnostics: Startup failure confirmed\nThermal sensors: Equipment overheating at 08:10\nEconomic impact: $2M/hour losses estimated"
+          },
+          lagos_mainland: {
+            lgaName: "Lagos Mainland",
+            timeline: "13:20 - Network configuration change deployed by mistake\n13:25 - ACL rules blocked legitimate traffic\n13:30 - Change management protocol violated\n13:35 - Incident triggered: NCC Alert Level Orange\n13:45 - Configuration rollback initiated",
+            affectedServices: ["Corporate Networks", "Enterprise Services", "Government Communications"],
+            kpis: "Service Availability: 45%\nPacket Loss: 55%\nLatency: 190ms\nThroughput: 14 Mbps\nAffected Subscribers: 167,300",
+            impactedSubscribers: 167300,
+            rootCause: "Human Error - Configuration Change deployed without proper testing or review. ACL rules misconfigured blocking legitimate traffic and violating change management protocols.",
+            correctiveActions: "1. Implement configuration rollback to last known good state\n2. Establish mandatory change review and testing protocols\n3. Deploy automated configuration validation systems\n4. Conduct comprehensive security and access control audit",
+            evidenceLogs: "Configuration audit: ACL rules deployed at 13:20\nTraffic monitoring: Legitimate traffic blocked\nChange logs: Protocol violation confirmed\nRollback execution: Previous config restored at 13:45"
+          },
+          mushin: {
+            lgaName: "Mushin",
+            timeline: "17:45 - Smoke detected in Mushin equipment room\n17:48 - Automatic fire suppression system activated\n17:50 - Electrical fire caused by faulty wiring\n17:52 - Incident triggered: NCC Alert Level Red\n18:00 - Fire department arrived on scene\n18:15 - Water damage assessment initiated",
+            affectedServices: ["Voice Communications", "Data Services", "Internet Connectivity", "Enterprise Links"],
+            kpis: "Service Availability: 20%\nPacket Loss: 80%\nLatency: 350ms\nThroughput: 4 Mbps\nAffected Subscribers: 112,600",
+            impactedSubscribers: 112600,
+            rootCause: "Fire Incident - Electrical Fault caused ignition in equipment room. Faulty wiring combined with inadequate fire suppression response and maintenance neglect.",
+            correctiveActions: "1. Coordinate with fire department for scene assessment\n2. Implement equipment salvage and data recovery protocols\n3. Establish temporary service restoration through mobile units\n4. Conduct comprehensive electrical and fire safety audit",
+            evidenceLogs: "Smoke detectors: Activation at 17:45\nFire suppression: Automatic system engaged\nElectrical inspection: Faulty wiring identified\nDamage assessment: Water and smoke damage confirmed"
+          },
+          oshodi: {
+            lgaName: "Oshodi",
+            timeline: "07:30 - Commercial vehicle collided with utility pole\n07:32 - Overhead fiber cables severed by impact\n07:35 - Emergency services responded to accident scene\n07:37 - Incident triggered: NCC Alert Level Red\n07:45 - Traffic diversion implemented by local authorities\n08:00 - Temporary cable repair completed",
+            affectedServices: ["Transport Hub Communications", "Logistics Networks", "Enterprise Services"],
+            kpis: "Service Availability: 30%\nPacket Loss: 70%\nLatency: 240ms\nThroughput: 6 Mbps\nAffected Subscribers: 138,900",
+            impactedSubscribers: 138900,
+            rootCause: "Traffic Accident - Utility Pole Collision by commercial vehicle severed overhead fiber cables. High-risk corridor with inadequate pole protection and emergency response delays.",
+            correctiveActions: "1. Coordinate with traffic authorities for accident investigation\n2. Implement pole reinforcement and cable burial programs\n3. Deploy temporary cable repair and service restoration\n4. Develop accident prevention protocols for infrastructure corridors",
+            evidenceLogs: "Traffic camera: Vehicle collision at 07:30\nCable damage: Overhead lines severed\nEmergency response: Traffic diversion at 07:45\nRepair completion: Temporary restoration at 08:00"
+          },
+          shomolu: {
+            lgaName: "Shomolu",
+            timeline: "10:15 - Core switch failed in Shomolu data center\n10:20 - Redundant switch failed simultaneously\n10:25 - Hardware diagnostics revealed manufacturing defect\n10:30 - Incident triggered: NCC Alert Level Orange\n10:45 - Hot swap replacement initiated",
+            affectedServices: ["Network Switching", "Data Center Services", "Cloud Connectivity"],
+            kpis: "Service Availability: 55%\nPacket Loss: 45%\nLatency: 130ms\nThroughput: 19 Mbps\nAffected Subscribers: 76,200",
+            impactedSubscribers: 76200,
+            rootCause: "Hardware Failure - Switch Failure due to manufacturing defect affecting redundant systems simultaneously. Quality control failure in procurement and inadequate monitoring.",
+            correctiveActions: "1. Perform hot swap of failed hardware components\n2. Implement hardware redundancy and monitoring upgrades\n3. Conduct comprehensive equipment quality audit\n4. Develop predictive failure detection and prevention systems",
+            evidenceLogs: "Hardware diagnostics: Manufacturing defect confirmed\nRedundancy test: Simultaneous failure detected\nProcurement audit: Quality control bypassed\nReplacement: Hot swap completed at 10:45"
+          },
+          surulere: {
+            lgaName: "Surulere",
+            timeline: "04:00 - Unusual traffic patterns detected globally\n04:05 - DDoS attack confirmed targeting Surulere infrastructure\n04:10 - Traffic volume exceeded 10Gbps threshold\n04:15 - Incident triggered: NCC Alert Level Red\n04:25 - DDoS mitigation systems activated\n04:40 - Attack source tracing initiated",
+            affectedServices: ["Internet Services", "Web Hosting", "Enterprise Security", "Cloud Services"],
+            kpis: "Service Availability: 25%\nPacket Loss: 75%\nLatency: 400ms\nThroughput: 3 Mbps\nAffected Subscribers: 129,400",
+            impactedSubscribers: 129400,
+            rootCause: "Cyber Attack - DDoS Assault overwhelmed network infrastructure with coordinated botnet attack. Security systems inadequate for current threat landscape and attack volumes.",
+            correctiveActions: "1. Activate DDoS mitigation systems and traffic scrubbing\n2. Implement network segmentation to contain attack spread\n3. Coordinate with cybersecurity authorities for attack attribution\n4. Conduct comprehensive security audit and hardening",
+            evidenceLogs: "Traffic analysis: 10Gbps attack volume\nAttack pattern: Botnet signatures identified\nSecurity systems: Mitigation activated at 04:25\nSource tracing: International attack vectors confirmed"
+          },
+          yaba: {
+            lgaName: "Yaba",
+            timeline: "12:30 - Building collapse reported in Yaba commercial district\n12:32 - Underground fiber ducts crushed by debris\n12:35 - Emergency rescue operations commenced\n12:37 - Incident triggered: NCC Alert Level Red\n13:00 - Structural engineers assessed damage extent\n13:15 - Cable recovery operations planned",
+            affectedServices: ["Educational Networks", "Research Facilities", "Student Housing", "Campus Services"],
+            kpis: "Service Availability: 15%\nPacket Loss: 85%\nLatency: 500ms\nThroughput: 2 Mbps\nAffected Subscribers: 95,600",
+            impactedSubscribers: 95600,
+            rootCause: "Building Collapse - Structural Damage crushed underground fiber optic ducts. Construction quality failure led to structural collapse affecting buried infrastructure.",
+            correctiveActions: "1. Coordinate with emergency services for structural assessment\n2. Implement cable recovery and repair protocols\n3. Establish temporary service through wireless networks\n4. Conduct infrastructure resilience audit for earthquake-prone areas",
+            evidenceLogs: "Emergency reports: Building collapse at 12:30\nStructural assessment: Debris damage confirmed\nCable inspection: Underground ducts crushed\nRecovery planning: Operations initiated at 13:15"
+          }
+        };
+        return Promise.resolve({ data: mockCompliancePacks[lgaId || "ikeja"] || mockCompliancePacks.ikeja });
+      } catch (e) {
+        console.error('Error in /compliance/pack endpoint:', e);
+        return Promise.reject(new Error('Failed to load compliance pack'));
       }
     }
     return Promise.reject(new Error("Not implemented"));
@@ -1249,192 +1443,23 @@ const mockApi = {
       }, 10000);
       return Promise.resolve({ data: { status: "ok" } });
     }
-    if (url === "/compliance/pack/" + url.split('/compliance/pack/')[1]) {
+    if (url.startsWith('/compliance/pack/')) {
       const incidentId = url.split('/compliance/pack/')[1];
-      const lgaId = incidentId.split('-')[1].toLowerCase();
-      const complianceData: Record<string, any> = {
-        agege: {
-          lgaName: "Agege",
-          timeline: "2026-05-03T21:45:00Z - 23:30:00Z",
-          affectedServices: ["Power Distribution", "Network Infrastructure", "Data Centers"],
-          kpis: "Power Availability: 0% | Network Uptime: 12% | Temperature Control: Failed",
-          impactedSubscribers: 87500,
-          rootCause: "Grid transformer overload causing cascading power failure. Emergency generators failed to engage backup systems. Temperature monitoring systems inadequate for current load conditions.",
-          correctiveActions: "Deployed 2MW mobile diesel generators with automatic failover; Stabilized grid voltage at 225V; Restored cooling systems with backup power supply; Implemented automated failover protocols for power distribution.",
-          evidenceLogs: "Log-ID: PWR-AGE-001 | Sensor: Voltage_Monitor_Down | Action: Generator_Activation_Successful | Log-ID: TMP-AGE-002 | Sensor: Thermal_Overload | Action: Cooling_Restoration_Complete"
-        },
-        alimosho: {
-          lgaName: "Alimosho",
-          timeline: "2026-05-03T22:15:00Z - 24:00:00Z",
-          affectedServices: ["Copper Infrastructure", "Fiber Optics", "Wireless Backup"],
-          kpis: "Cable Integrity: 23% | Signal Strength: 15% | Security Incidents: 3 Recorded",
-          impactedSubscribers: 156200,
-          rootCause: "Organized cable theft targeting infrastructure corridors. Security monitoring inadequate. Emergency response delayed by 45 minutes due to coordination failures. Secondary routes compromised by physical damage to junction boxes.",
-          correctiveActions: "Established armed security patrols to all cable routes; Deployed 5G wireless mesh network covering affected areas with 10Gbps aggregate capacity; Filed police report and coordinated with local law enforcement; Implemented fiber optic cable burial program in high-risk areas.",
-          evidenceLogs: "Log-ID: SEC-ALM-001 | Camera: Corridor_7_Damage | Action: Security_Response_Activated | Log-ID: NET-ALM-002 | Sensor: Fiber_Loss_Complete | Action: Wireless_Failover_Engaged"
-        },
-        apapa: {
-          lgaName: "Apapa",
-          timeline: "2026-05-03T21:30:00Z - 23:45:00Z",
-          affectedServices: ["Port Communications", "Container Tracking", "Maritime Data"],
-          kpis: "Port Operations: 0% | Container Throughput: 0 TEU | Communication Uptime: 8%",
-          impactedSubscribers: 98400,
-          rootCause: "Container crane malfunction causing cable severance. Port safety protocols violated. Emergency communications failed due to single point of failure in infrastructure design. Heavy equipment operation without proper cable protection.",
-          correctiveActions: "Established satellite communication links for port operations and shipping communications; Deployed specialized diving team for underwater cable splicing and repair operations; Implemented redundant cable routing around heavy machinery zones; Developed incident response protocol for port-related infrastructure damage.",
-          evidenceLogs: "Log-ID: PRT-APA-001 | Sensor: Crane_Malfunction | Action: Emergency_Shutdown_Initiated | Log-ID: NET-APA-002 | Sensor: Cable_Severance_Detected | Action: Satellite_Backup_Activated"
-        },
-        badagry: {
-          lgaName: "Badagry",
-          timeline: "2026-05-03T23:10:00Z - 01:30:00Z",
-          affectedServices: ["Coastal Infrastructure", "Weather Monitoring", "Emergency Communications"],
-          kpis: "Signal Quality: 45% | Weather Data: Intermittent | Lightning Protection: 67% Effective",
-          impactedSubscribers: 32100,
-          rootCause: "Severe weather event with lightning strikes and flooding. Infrastructure not designed for current climate patterns. Drainage systems overwhelmed by unprecedented rainfall intensity. Lightning protection systems inadequate for coastal environment.",
-          correctiveActions: "Deployed Doppler radar and lightning detection systems for early warning; Enhanced lightning protection across all infrastructure with upgraded surge protectors; Implemented flood-resistant cable routing and junction boxes above projected flood levels; Activated emergency drainage protocols with backup pumping systems.",
-          evidenceLogs: "Log-ID: WTH-BAD-001 | Sensor: Rainfall_150mm/hr | Action: Drainage_Activation | Log-ID: LGT-BAD-002 | Sensor: Lightning_Strike_7 | Action: Protection_System_Upgrade_Initiated"
-        },
-        epe: {
-          lgaName: "Epe",
-          timeline: "2026-05-03T20:45:00Z - 22:30:00Z",
-          affectedServices: ["Undersea Communications", "Maritime Navigation", "Coastal Surveillance"],
-          kpis: "Cable Integrity: 33% | Signal Loss: 67% | Marine Traffic: Disrupted",
-          impactedSubscribers: 45200,
-          rootCause: "Unauthorized marine vessel activity in protected cable zone. Subsea monitoring systems failed to detect vessel approach. Cable protection inadequate against anchor damage from commercial shipping. Environmental monitoring systems not calibrated for marine conditions.",
-          correctiveActions: "Deployed marine patrol vessels to cable protection zone; Activated seabed sensors for real-time cable integrity monitoring; Coordinated with Nigerian Ports Authority for vessel movement restrictions; Initiated subsea cable burial and protection program for vulnerable segments.",
-          evidenceLogs: "Log-ID: MAR-EPE-001 | Sensor: Vessel_Detection_Unknown | Action: Patrol_Deployment | Log-ID: CAB-EPE-002 | Sensor: Cable_Integrity_Breach | Action: Burial_Program_Initiated"
-        },
-        eti_osa: {
-          lgaName: "Eti-Osa",
-          timeline: "2026-05-03T19:00:00Z - 21:15:00Z",
-          affectedServices: ["High-Density Data", "VIP Communications", "Event Infrastructure"],
-          kpis: "Bandwidth Utilization: 95% | Latency: 250ms | Service Quality: Degraded",
-          impactedSubscribers: 187600,
-          rootCause: "Unplanned high-density event in Eko Atlantic causing network saturation. Dynamic bandwidth allocation failed under extreme load. VIP service protocols conflicted with general traffic management. Infrastructure not scaled for peak event capacity.",
-          correctiveActions: "Implemented dynamic bandwidth scaling with 300% capacity increase from reserve pools; Activated satellite augmentation for immediate bandwidth relief; Deployed intelligent traffic shaping protocols to prioritize critical traffic; Established event coordination procedures with infrastructure capacity assessment.",
-          evidenceLogs: "Log-ID: EVT-ETI-001 | Sensor: Bandwidth_Saturation | Action: Scaling_Protocol_Activated | Log-ID: VIP-ETI-002 | Sensor: Priority_Traffic_Delay | Action: Satellite_Backup_Engaged"
-        },
-        ibeju_lekki: {
-          lgaName: "Ibeju-Lekki",
-          timeline: "2026-05-03T14:30:00Z - 16:45:00Z",
-          affectedServices: ["Construction Zone Infrastructure", "Temporary Services", "Utility Coordination"],
-          kpis: "Cable Integrity: 0% | Service Restoration: 35% | Construction Delay: 2 hours",
-          impactedSubscribers: 28600,
-          rootCause: "Road construction crew damaged overhead infrastructure. Utility marking systems inadequate. Emergency response delayed by traffic congestion and lack of coordination protocols. Construction permits not synchronized with infrastructure maintenance.",
-          correctiveActions: "Implemented immediate construction cessation in cable corridor zones; Deployed portable cell towers for immediate service restoration in affected areas; Initiated underground cable conversion program; Enhanced utility marking and coordination systems with GPS-guided marking.",
-          evidenceLogs: "Log-ID: CON-IBE-001 | Sensor: Cable_Damage_Detected | Action: Construction_Halt | Log-ID: RES-IBE-002 | Sensor: Wireless_Network_Online | Action: Service_Restoration_Initiated"
-        },
-        ifako_ijaiye: {
-          lgaName: "Ifako-Ijaiye",
-          timeline: "2026-05-03T16:20:00Z - 18:00:00Z",
-          affectedServices: ["Data Center Operations", "Temperature Control", "Hardware Integrity"],
-          kpis: "Equipment Temperature: 85°C | System Uptime: 45% | Cooling Efficiency: 0%",
-          impactedSubscribers: 72300,
-          rootCause: "Cooling system failure combined with high ambient temperatures. Maintenance schedules inadequate for current climate conditions. Automated shutdown protocols failed to engage properly. Redundant cooling systems not independently powered.",
-          correctiveActions: "Deployed industrial cooling units to prevent equipment overheating and failure; Implemented automated thermal management with temperature-based shutdown protocols; Restored HVAC systems with redundant power supplies; Enhanced predictive maintenance schedules based on usage patterns and environmental data.",
-          evidenceLogs: "Log-ID: TMP-IFI-001 | Sensor: Temperature_Critical | Action: Emergency_Cooling_Deployed | Log-ID: SYS-IFI-002 | Sensor: Shutdown_Protocol_Failed | Action: Manual_Intervention_Required"
-        },
-        ikeja: {
-          lgaName: "Ikeja",
-          timeline: "2026-05-03T22:04:00Z - 23:45:00Z",
-          affectedServices: ["Backbone Infrastructure", "Enterprise Networks", "Government Communications"],
-          kpis: "Network Uptime: 15% | Latency: 450ms | Packet Loss: 85%",
-          impactedSubscribers: 145800,
-          rootCause: "Physical fiber cut accompanied by logic failure on secondary failover controller. Construction activity in unauthorized zone. Redundancy systems not adequately tested for simultaneous failure scenarios. Geographic location makes Ikeja a critical network hub.",
-          correctiveActions: "Activated microwave failover network with 10Gbps capacity through Lagos-Island links; Dispatched emergency fiber repair teams with fusion splicing equipment; Implemented automated traffic rerouting through alternative network paths; Notified enterprise customers with SLA compensation protocols.",
-          evidenceLogs: "Log-ID: FIB-IKE-001 | Sensor: Optical_Loss_High | Action: Microwave_Failover_Triggered | Log-ID: NET-IKE-002 | Sensor: Route_Convergence_Failed | Action: Manual_Rerouting_Initiated"
-        },
-        ikorodu: {
-          lgaName: "Ikorodu",
-          timeline: "2026-05-03T03:15:00Z - 05:30:00Z",
-          affectedServices: ["Underground Infrastructure", "Pest Control Systems", "Environmental Monitoring"],
-          kpis: "Cable Integrity: 45% | Pest Activity: High | Environmental Control: Inadequate",
-          impactedSubscribers: 56800,
-          rootCause: "Rodent infestation in underground duct systems. Environmental conditions favorable for pest proliferation. Cable protection inadequate for biological threats. Previous similar incidents indicate systemic vulnerability. Monitoring systems not designed for pest detection.",
-          correctiveActions: "Deployed certified pest control teams with rodent-specific eradication protocols; Installed hardened conduit systems resistant to rodent intrusion and chewing; Implemented automated pest monitoring with ultrasonic sensors and cameras; Enhanced environmental controls to reduce pest attraction factors.",
-          evidenceLogs: "Log-ID: PST-IKO-001 | Camera: Duct_Inspection_Rodent | Action: Pest_Control_Activated | Log-ID: CAB-IKO-002 | Sensor: Cable_Damage_Pattern | Action: Protection_Upgrade_Initiated"
-        },
-        kosofe: {
-          lgaName: "Kosofe",
-          timeline: "2026-05-03T11:30:00Z - 13:15:00Z",
-          affectedServices: ["Routing Infrastructure", "Network Stability", "Configuration Management"],
-          kpis: "Route Stability: 12% | Convergence Time: 450s | Packet Loss: 78%",
-          impactedSubscribers: 89400,
-          rootCause: "Software routing protocol bug introduced in recent update. Configuration change deployed without adequate testing. Network convergence algorithms overwhelmed by route flapping. Change management protocols violated. BGP route dampening not configured.",
-          correctiveActions: "Implemented BGP route dampening with aggressive parameters to stabilize convergence; Executed configuration rollback to last known good state; Isolated affected network segments to prevent propagation; Conducted comprehensive routing protocol audit and validation testing.",
-          evidenceLogs: "Log-ID: BGP-KOS-001 | Sensor: Route_Flapping_Detected | Action: Dampening_Activated | Log-ID: CFG-KOS-002 | Sensor: Configuration_Change_Invalid | Action: Rollback_Initiated"
-        },
-        lagos_island: {
-          lgaName: "Lagos Island",
-          timeline: "2026-05-03T08:00:00Z - 12:00:00Z",
-          affectedServices: ["Financial Infrastructure", "Government Systems", "Critical Communications"],
-          kpis: "System Availability: 0% | Economic Impact: $2M/hour | Critical Services: Down",
-          impactedSubscribers: 203400,
-          rootCause: "Cascading infrastructure failure from power outage. Backup systems inadequately maintained. Critical infrastructure concentration creates single point of failure. Emergency response protocols not designed for total facility failure. Financial district completely offline.",
-          correctiveActions: "Established emergency command center with full redundancy in unaffected location; Activated geographically distributed backup infrastructure across multiple sites; Executed comprehensive disaster recovery protocols with priority restoration; Coordinated with emergency services for priority restoration of financial and government systems.",
-          evidenceLogs: "Log-ID: PWR-LAG-001 | Sensor: Total_Power_Failure | Action: Emergency_Center_Activated | Log-ID: SYS-LAG-002 | Sensor: Critical_Systems_Down | Action: Disaster_Recovery_Initiated"
-        },
-        lagos_mainland: {
-          lgaName: "Lagos Mainland",
-          timeline: "2026-05-03T13:20:00Z - 15:00:00Z",
-          affectedServices: ["Access Control Systems", "Configuration Management", "Network Security"],
-          kpis: "Access Success Rate: 35% | Configuration Integrity: Compromised | Security Violations: Multiple",
-          impactedSubscribers: 167300,
-          rootCause: "Human error in configuration change deployment. Access control lists misconfigured blocking legitimate traffic. Change management procedures bypassed. Peer review and testing protocols not followed. Configuration backup inadequate.",
-          correctiveActions: "Executed immediate configuration rollback to verified state; Implemented mandatory change review and testing protocols with automated validation; Deployed automated configuration validation systems with integrity checking; Conducted comprehensive access control and security audit with policy updates.",
-          evidenceLogs: "Log-ID: CFG-LAM-001 | Sensor: ACL_Change_Invalid | Action: Rollback_Executed | Log-ID: SEC-LAM-002 | Sensor: Access_Violations_Detected | Action: Audit_Initiated"
-        },
-        mushin: {
-          lgaName: "Mushin",
-          timeline: "2026-05-03T17:45:00Z - 20:00:00Z",
-          affectedServices: ["Equipment Integrity", "Fire Suppression", "Data Recovery"],
-          kpis: "Equipment Status: 25% Operational | Fire Damage: Extensive | Data Integrity: At Risk",
-          impactedSubscribers: 112600,
-          rootCause: "Electrical fault causing fire ignition. Fire suppression systems failed to activate. Equipment protection inadequate. Emergency response delayed by building access issues. Smoke and water damage compromised adjacent equipment. Building evacuation safety concerns.",
-          correctiveActions: "Coordinated with fire department for damage assessment and safety clearance; Executed equipment salvage and data recovery protocols with specialized teams; Deployed mobile service units for temporary restoration in unaffected areas; Conducted comprehensive electrical and fire safety audit with system upgrades.",
-          evidenceLogs: "Log-ID: FIR-MUS-001 | Sensor: Smoke_Detection_Activated | Action: Fire_Response_Coordinated | Log-ID: EQP-MUS-002 | Sensor: Equipment_Damage_Assessed | Action: Salvage_Operations_Initiated"
-        },
-        oshodi: {
-          lgaName: "Oshodi",
-          timeline: "2026-05-03T07:30:00Z - 10:15:00Z",
-          affectedServices: ["Utility Infrastructure", "Traffic Management", "Emergency Response"],
-          kpis: "Infrastructure Integrity: 0% | Traffic Flow: Blocked | Emergency Access: Restricted",
-          impactedSubscribers: 138900,
-          rootCause: "Commercial vehicle collision with utility pole. Infrastructure not designed to withstand impact. Emergency response delayed by accident scene congestion. Secondary safety incidents from exposed live wires. Traffic diversion inadequate for incident scale.",
-          correctiveActions: "Coordinated with traffic authorities for accident investigation and scene management; Implemented pole reinforcement and cable protection programs with impact-resistant designs; Deployed emergency cable repair teams for temporary restoration; Enhanced corridor safety measures and accident prevention protocols with vehicle barriers.",
-          evidenceLogs: "Log-ID: ACC-OSH-001 | Sensor: Impact_Detection | Action: Traffic_Coordination_Initiated | Log-ID: INF-OSH-002 | Sensor: Infrastructure_Damage | Action: Repair_Teams_Dispatched"
-        },
-        shomolu: {
-          lgaName: "Shomolu",
-          timeline: "2026-05-03T10:15:00Z - 12:00:00Z",
-          affectedServices: ["Hardware Systems", "Redundancy Infrastructure", "Quality Control"],
-          kpis: "Hardware Reliability: 0% | System Uptime: 35% | Redundancy Effectiveness: Failed",
-          impactedSubscribers: 76200,
-          rootCause: "Manufacturing defect in core hardware components. Quality control failure in procurement process. Redundant systems failed simultaneously due to shared component issues. Predictive monitoring systems inadequate. Firmware not updated for known vulnerabilities.",
-          correctiveActions: "Performed hot swap hardware replacement of failed components with certified units; Enhanced redundancy systems with diverse component sourcing and independent power; Conducted comprehensive equipment quality audit with vendor assessment; Implemented advanced predictive failure detection and monitoring systems with AI analytics.",
-          evidenceLogs: "Log-ID: HW-SHO-001 | Sensor: Component_Failure_Detected | Action: Hot_Swap_Initiated | Log-ID: RED-SHO-002 | Sensor: Redundancy_Failure | Action: System_Upgrade_Planned"
-        },
-        surulere: {
-          lgaName: "Surulere",
-          timeline: "2026-05-03T04:00:00Z - 06:30:00Z",
-          affectedServices: ["Network Security", "Cyber Defense", "Threat Intelligence"],
-          kpis: "Security Effectiveness: 15% | Attack Volume: 10Gbps | Threat Containment: Partial",
-          impactedSubscribers: 129400,
-          rootCause: "Coordinated DDoS attack overwhelming security infrastructure. Attack vectors exploited multiple vulnerabilities simultaneously. Security systems not scaled for current threat levels. Response protocols delayed by multi-vector attack complexity. Botnet infrastructure sophisticated.",
-          correctiveActions: "Activated global DDoS mitigation and traffic scrubbing systems with 100Gbps capacity; Implemented emergency network segmentation to contain attack spread and prevent lateral movement; Coordinated with cybersecurity authorities for threat intelligence and attack attribution; Enhanced security hardening and threat detection capabilities with next-generation firewalls.",
-          evidenceLogs: "Log-ID: DDoS-SUR-001 | Sensor: Attack_Volume_Spike | Action: Mitigation_Activated | Log-ID: SEC-SUR-002 | Sensor: Threat_Containment_Initiated | Action: Authority_Coordination_Established"
-        },
-        yaba: {
-          lgaName: "Yaba",
-          timeline: "2026-05-03T12:30:00Z - 16:00:00Z",
-          affectedServices: ["Structural Integrity", "Infrastructure Protection", "Emergency Recovery"],
-          kpis: "Structural Stability: Critical | Infrastructure Access: Blocked | Recovery Progress: 0%",
-          impactedSubscribers: 95600,
-          rootCause: "Building collapse compromising underground infrastructure. Construction quality failure leading to structural failure. Emergency response complicated by debris field and access restrictions. Risk assessment inadequate for urban density. Structural integrity monitoring absent.",
-          correctiveActions: "Coordinated with structural engineers and emergency services for comprehensive damage assessment; Executed infrastructure recovery operations under emergency conditions with heavy equipment; Deployed temporary wireless networks for service restoration in accessible areas; Conducted comprehensive infrastructure resilience audit for earthquake-prone areas with retrofit recommendations.",
-          evidenceLogs: "Log-ID: STR-YAB-001 | Sensor: Structural_Failure_Detected | Action: Emergency_Assessment_Initiated | Log-ID: INF-YAB-002 | Sensor: Infrastructure_Compromised | Action: Recovery_Operations_Started"
-        }
+      const lgaId = incidentId.split('-')[1]?.toLowerCase() || 'ikeja';
+
+      // Simple compliance data for now
+      const defaultCompliance = {
+        lgaName: lgaId.charAt(0).toUpperCase() + lgaId.slice(1),
+        timeline: "2026-05-03T22:04:00Z - 23:45:00Z",
+        affectedServices: ["Network Infrastructure", "Services"],
+        kpis: "Uptime: 85% | Quality: Good",
+        impactedSubscribers: 100000,
+        rootCause: "Technical incident requiring regulatory documentation",
+        correctiveActions: "Applied standard mitigation procedures",
+        evidenceLogs: "Log-ID: SYS-001 | Evidence collected"
       };
-      return Promise.resolve({ data: complianceData[lgaId] || complianceData.ikeja });
+
+      return Promise.resolve({ data: defaultCompliance });
     }
     return Promise.reject(new Error("Not implemented"));
   }
