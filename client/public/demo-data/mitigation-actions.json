@@ -1,0 +1,26 @@
+[
+  {
+    "id": "action-1",
+    "name": "Microwave Failover (Zone 5)",
+    "riskReduction": 45,
+    "confidence": 0.92,
+    "timeToEffect": "4m",
+    "description": "Redirect critical traffic through temporary microwave links."
+  },
+  {
+    "id": "action-2",
+    "name": "Partial Node Restoration",
+    "riskReduction": 25,
+    "confidence": 0.65,
+    "timeToEffect": "15m",
+    "description": "Attempt software reboot of the edge switches."
+  },
+  {
+    "id": "baseline",
+    "name": "Do-Nothing Baseline",
+    "riskReduction": 0,
+    "confidence": 1.0,
+    "timeToEffect": "0m",
+    "description": "Maintain current state. Risk is projected to hit 100 in 42 minutes."
+  }
+]

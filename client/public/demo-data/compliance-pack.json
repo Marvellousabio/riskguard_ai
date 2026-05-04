@@ -1,0 +1,9 @@
+{
+  "timeline": "2026-05-02T22:04:00Z - 22:15:00Z",
+  "affectedServices": ["Data", "VoIP", "Enterprise MPLS"],
+  "kpis": "Uptime: 14% | Latency: 450ms | Packet Loss: 85%",
+  "impactedSubscribers": 124500,
+  "rootCause": "Physical fiber cut accompanied by logic failure on secondary failover controller.",
+  "correctiveActions": "Rerouted via Microwave Link; Replaced faulty edge switch at Site-IKEJA-4.",
+  "evidenceLogs": "Log-ID: 772-AX | Sensor: Optical_Loss_High | Action: Failover_Triggered"
+}

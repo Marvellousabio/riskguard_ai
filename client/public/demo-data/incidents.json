@@ -1,0 +1,162 @@
+{
+  "INC-IKEJA-001": {
+    "id": "INC-IKEJA-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Ikeja Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-LEKKI-001": {
+    "id": "INC-LEKKI-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Lekki Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-SURULERE-001": {
+    "id": "INC-SURULERE-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Surulere Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-AGEGE-001": {
+    "id": "INC-AGEGE-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Agege Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-ALIMOSHO-001": {
+    "id": "INC-ALIMOSHO-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Alimosho Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-APAPA-001": {
+    "id": "INC-APAPA-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Apapa Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-ETI_OSA-001": {
+    "id": "INC-ETI_OSA-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Eti-Osa Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-IKORODU-001": {
+    "id": "INC-IKORODU-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Ikorodu Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-MUSHIN-001": {
+    "id": "INC-MUSHIN-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Mushin Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  },
+  "INC-OSHODI-001": {
+    "id": "INC-OSHODI-001",
+    "cause": "Backbone Fiber Link Cut (Main-One Subsea Secondary)",
+    "riskScore": 87,
+    "timeToBreach": "42m",
+    "affectedSubscribers": 124500,
+    "enterpriseLines": 840,
+    "revenueAtRisk": "$12,400/hr",
+    "nccExposure": "Critical (Tier 1 Violation)",
+    "phase": "active",
+    "timeline": [
+      { "time": "22:04", "event": "Anomalous latency detected on Oshodi Node-4" },
+      { "time": "22:06", "event": "Packet loss exceeded 15% threshold" },
+      { "time": "22:08", "event": "Incident triggered: NCC Alert Level Orange" }
+    ]
+  }
+}
