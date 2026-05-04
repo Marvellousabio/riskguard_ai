@@ -4,14 +4,16 @@
  */
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import { TopBar } from "./components/layout/TopBar";
-import { RiskRadar } from "./components/risk/RiskRadar";
-import { IncidentPanel } from "./components/incident/IncidentPanel";
-import { CopilotPanel } from "./components/copilot/CopilotPanel";
-import { MitigationPanel } from "./components/mitigation/MitigationPanel";
-import { CompliancePackView } from "./components/compliance/CompliancePack";
 import { RecoveryView } from "./components/risk/RecoveryView";
+
+// Lazy load heavy components
+const RiskRadar = lazy(() => import("./components/risk/RiskRadar").then(module => ({ default: module.RiskRadar })));
+const IncidentPanel = lazy(() => import("./components/incident/IncidentPanel").then(module => ({ default: module.IncidentPanel })));
+const CopilotPanel = lazy(() => import("./components/copilot/CopilotPanel").then(module => ({ default: module.CopilotPanel })));
+const MitigationPanel = lazy(() => import("./components/mitigation/MitigationPanel").then(module => ({ default: module.MitigationPanel })));
+const CompliancePackView = lazy(() => import("./components/compliance/CompliancePack").then(module => ({ default: module.CompliancePackView })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,16 +40,16 @@ export default function App() {
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Risk Radar (LGAs)</h2>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <RiskRadar 
-                onSelectLGA={(lgaId) => {
-                  if (lgaId === "ikeja") {
-                    setSelectedIncidentId("INC-IK-001");
-                  }
-                }} 
-              />
+              <Suspense fallback={<div className="p-6 h-[400px] flex items-center justify-center"><div className="animate-pulse text-slate-400">Loading Risk Radar...</div></div>}>
+                <RiskRadar
+                  onSelectLGA={(lgaId) => {
+                    setSelectedIncidentId(`INC-${lgaId.toUpperCase()}-001`);
+                  }}
+                />
+              </Suspense>
             </div>
             <div className="p-4 border-t bg-slate-50 flex-none">
-              <RecoveryView />
+              <RecoveryView selectedIncidentId={selectedIncidentId} />
             </div>
           </aside>
 
@@ -73,14 +75,20 @@ export default function App() {
             </div>
 
             <div className="flex-1 overflow-hidden">
-              {activeTab === "incident" ? (
-                <IncidentPanel incidentId={selectedIncidentId}>
-                  <CopilotPanel incidentId={selectedIncidentId} />
-                  <MitigationPanel incidentId={selectedIncidentId} />
-                </IncidentPanel>
-              ) : (
-                <CompliancePackView incidentId={selectedIncidentId} />
-              )}
+              <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="animate-pulse text-slate-400">Loading...</div></div>}>
+                {activeTab === "incident" ? (
+                  <IncidentPanel incidentId={selectedIncidentId}>
+                    <Suspense fallback={<div className="p-4 text-slate-400">Loading AI Assistant...</div>}>
+                      <CopilotPanel incidentId={selectedIncidentId} />
+                    </Suspense>
+                    <Suspense fallback={<div className="p-4 text-slate-400">Loading Mitigation Panel...</div>}>
+                      <MitigationPanel incidentId={selectedIncidentId} />
+                    </Suspense>
+                  </IncidentPanel>
+                ) : (
+                  <CompliancePackView incidentId={selectedIncidentId} />
+                )}
+              </Suspense>
             </div>
           </section>
         </main>

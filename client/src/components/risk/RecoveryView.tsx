@@ -2,29 +2,34 @@ import { useQuery } from "@tanstack/react-query";
 import { api, LGA } from "../../lib/api";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 
-export function RecoveryView() {
+interface RecoveryViewProps {
+  selectedIncidentId: string | null;
+}
+
+export function RecoveryView({ selectedIncidentId }: RecoveryViewProps) {
   const { data: lgas } = useQuery<LGA[]>({
     queryKey: ["riskMap"],
     queryFn: () => api.get("/risk/map").then((res) => res.data),
     refetchInterval: 5000,
   });
 
-  const ikeja = lgas?.find(l => l.id === "ikeja");
-  
+  const selectedLgaId = selectedIncidentId ? selectedIncidentId.split('-')[1].toLowerCase() : "ikeja";
+  const selectedLga = lgas?.find(l => l.id === selectedLgaId);
+
   // Mock history for chart (last 5 intervals)
   // In a real app we'd fetch actual timeseries
   const data = [
     { time: "T-20", risk: 12 },
     { time: "T-15", risk: 12 },
     { time: "T-10", risk: 87 },
-    { time: "T-5", risk: ikeja?.risk || 87 },
-    { time: "NOW", risk: ikeja?.risk || 87 },
+    { time: "T-5", risk: selectedLga?.risk || 87 },
+    { time: "NOW", risk: selectedLga?.risk || 87 },
   ];
 
   return (
     <div className="panel-card p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Recovery Vector (Ikeja)</h3>
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Recovery Vector ({selectedLga?.name || "Ikeja"})</h3>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-primary" />

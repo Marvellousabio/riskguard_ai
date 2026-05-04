@@ -42,6 +42,7 @@ export interface MitigationAction {
 }
 
 export interface CompliancePack {
+  lgaName: string;
   timeline: string;
   affectedServices: string[];
   kpis: string;

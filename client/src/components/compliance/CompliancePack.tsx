@@ -37,6 +37,7 @@ export function CompliancePackView({ incidentId }: CompliancePackViewProps) {
           <div>
             <h2 className="text-sm font-bold text-slate-900">NCC Incident Compliance Report</h2>
             <p className="text-[9px] font-mono text-slate-400 uppercase tracking-widest leading-none mt-1">Ref: REG-NCC-LGS-{incidentId}</p>
+            <p className="text-[9px] text-slate-500 mt-0.5">{pack.lgaName} LGA Incident</p>
           </div>
         </div>
         <button className="flex items-center gap-2 px-3 py-1.5 bg-slate-900 text-white rounded text-[10px] font-bold hover:bg-slate-800 transition-all uppercase tracking-tighter">
