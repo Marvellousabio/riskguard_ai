@@ -21,7 +21,7 @@ export function TopBar({ onIncidentDetection }: TopBarProps) {
     mutationFn: () => api.post("/simulation/trigger"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["riskMap"] });
-      // Don't set a specific incident, let user select
+      onIncidentDetection("INC-IKEJA-001"); // Select Ikeja incident by default
     },
   });
 

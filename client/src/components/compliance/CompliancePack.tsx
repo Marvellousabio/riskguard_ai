@@ -8,18 +8,35 @@ interface CompliancePackViewProps {
 }
 
 export function CompliancePackView({ incidentId }: CompliancePackViewProps) {
-  const { data: pack, isLoading } = useQuery<CompliancePack>({
+  const { data: pack, isLoading, error } = useQuery<CompliancePack>({
     queryKey: ["compliancePack", incidentId],
     queryFn: () => api.get(`/compliance/pack/${incidentId}`).then(res => res.data),
     enabled: !!incidentId,
   });
 
+  if (error) {
+    return (
+      <div className="panel-card h-full flex flex-col items-center justify-center p-12 text-center text-red-500">
+        <FileText size={64} className="mb-4 opacity-10" />
+        <h3 className="font-bold text-lg text-red-400">Compliance Pack Error</h3>
+        <p className="text-sm max-w-[280px]">Failed to load compliance documentation. Please try selecting an LGA first.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-red-100 rounded-md text-red-700 text-xs hover:bg-red-200"
+        >
+          Reload Page
+        </button>
+      </div>
+    );
+  }
+
   if (!incidentId) {
     return (
-      <div className="panel-card h-[600px] flex flex-col items-center justify-center p-12 text-center text-slate-400 bg-white">
+      <div className="panel-card h-full flex flex-col items-center justify-center p-12 text-center text-slate-400">
         <FileText size={64} className="mb-4 opacity-10" />
         <h3 className="font-bold text-lg text-slate-300">NCC Compliance Pack</h3>
-        <p className="text-sm max-w-[280px]">Regulatory documentation is automatically generated upon incident detection for submission to NCC portals.</p>
+        <p className="text-sm max-w-[280px] mb-4">Regulatory documentation is automatically generated upon incident detection for submission to NCC portals.</p>
+        <p className="text-xs text-slate-500">Please trigger incidents and select an LGA from the Risk Radar to view compliance documentation.</p>
       </div>
     );
   }
