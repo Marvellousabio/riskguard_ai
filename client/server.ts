@@ -1469,6 +1469,7 @@ async function startServer() {
     const data = complianceData[lga?.id as keyof typeof complianceData] || complianceData.ikeja;
 
     res.json({
+      lgaName: lgaName,
       timeline: data.timeline,
       affectedServices: data.affectedServices,
       kpis: data.kpis,

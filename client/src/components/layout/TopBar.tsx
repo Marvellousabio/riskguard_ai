@@ -18,10 +18,10 @@ export function TopBar({ onIncidentDetection }: TopBarProps) {
   });
 
   const triggerMutation = useMutation({
-    mutationFn: () => api.post("/simulation/trigger/ikeja"),
+    mutationFn: () => api.post("/simulation/trigger"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["riskMap"] });
-      onIncidentDetection("INC-IK-001");
+      // Don't set a specific incident, let user select
     },
   });
 
@@ -65,12 +65,12 @@ export function TopBar({ onIncidentDetection }: TopBarProps) {
         >
           Start Simulation
         </button>
-        <button 
+        <button
           onClick={() => triggerMutation.mutate()}
           disabled={triggerMutation.isPending}
           className="px-3 py-1.5 text-xs font-semibold border border-red-200 text-red-600 rounded hover:bg-red-50 disabled:opacity-50 transition-colors"
         >
-          Trigger Ikeja Incident
+          Trigger Incidents
         </button>
         <button 
           onClick={() => mitigateMutation.mutate()}
